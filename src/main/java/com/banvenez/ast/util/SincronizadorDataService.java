@@ -38,9 +38,29 @@ public class SincronizadorDataService {
 
             String fechaInicio = fechaFormateada + " 00:00:00";
             String fechaFin = fechaFormateada + " 23:59:59";
+            log.info("Fechas a buscar  fecha Inicio " + fechaInicio);
+            log.info("Fechas a buscar  fecha Fin " + fechaFin);
+            List<carnetDto> carnet = daoCarnet.obternerRegistros(fechaInicio, fechaFin);
+            if(carnet.size() > 0){
+                resp = daoAsistencia.guardarEmpleados(carnet);
+            }else{
+                resp.setEstatus("FAIL");
+                resp.setMensaje("no se obtuvo data de la base de datos de carnetizacion");
+            }
 
-            fechaInicio = "2022-06-01 00:00:00";
-            fechaFin = "2022-06-01 23:59:59";
+        }catch ( Exception e){
+            resp.setEstatus("FAIL");
+            resp.setMensaje("Incoveniente en procesar la sincronizacion");
+            resp.setData(e.getMessage());
+            log.error("SincronizadorDataService:sincronizacionDataMasivo mensaje ==>");
+            log.error(e.getMessage());
+        }
+        return resp;
+    }
+
+    public respuestaIntranetDto sincronizacionDataMasivoRangoFecha(String fechaInicio, String fechaFin) {
+        respuestaIntranetDto resp = new respuestaIntranetDto();
+        try {
             log.info("Fechas a buscar  fecha Inicio " + fechaInicio);
             log.info("Fechas a buscar  fecha Fin " + fechaFin);
             List<carnetDto> carnet = daoCarnet.obternerRegistros(fechaInicio, fechaFin);
