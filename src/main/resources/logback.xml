@@ -13,7 +13,7 @@
     <springProfile name="prod">
 
         <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>/oracle/Middleware/oracle_home/intranet/logs/lpadWs.log</file>
+            <file>/oracle/Middleware/oracle_home/intranet/logs/astWS.log</file>
 
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>

@@ -18,8 +18,6 @@ public class DbConfig {
     @Bean
     public DataSource getDataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-
-
         return dataSourceBuilder.build();
     }
 
