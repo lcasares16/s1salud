@@ -1,7 +1,8 @@
 package com.banvenez.ast;
 
 import com.banvenez.ast.dto.respuestaIntranetDto;
-import com.banvenez.ast.util.SincronizadorDataService;
+
+import com.banvenez.ast.util.VacacionesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -16,8 +17,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Slf4j
 public class AstWSApplication {
 
+//    @Autowired
+//    SincronizadorDataService sincronizadorService;
+
     @Autowired
-    SincronizadorDataService sincronizadorService;
+    VacacionesService vacacionesService;
+
     public static void main(String[] args) {
         SpringApplication.run(AstWSApplication.class, args);
     }
@@ -28,11 +33,31 @@ public class AstWSApplication {
         long tiempoInicial = System.currentTimeMillis();
                 long tiempoFinal = 0;
         try {
-            respuestaIntranetDto resp = sincronizadorService.sincronizacionDataMasivo();
-            log.info("Respuesta de sincronizacion " + resp);
+      //      respuestaIntranetDto resp = sincronizadorService.sincronizacionDataMasivo();
+          //  log.info("Respuesta de sincronizacion " + resp);
              tiempoFinal = System.currentTimeMillis();
         }catch (Exception e){
             log.error("AstWSApplication:sincronizacionData  ==>");
+            log.error(e.getMessage());
+        }
+        log.info("Tiempo Estimado del Proceso  Cron sincronizadorD  ==> "+ ((new Double((tiempoFinal-tiempoInicial))/1000)/60)+" minutos");
+    }
+
+
+
+    public void notificacionesVacaciones(){
+        long tiempoInicial = System.currentTimeMillis();
+        long tiempoFinal = 0;
+        try {
+            respuestaIntranetDto resp = vacacionesService.gestionVacacionesVencidas();
+            tiempoFinal = System.currentTimeMillis();
+            if(resp.getEstatus().equalsIgnoreCase("SUCCESS")){
+                log.info(resp.getMensaje());
+            }else{
+                log.error(resp.getMensaje());
+            }
+        }catch (Exception e){
+            log.error("AstWSApplication:notificacionesVacaciones  ==>");
             log.error(e.getMessage());
         }
         log.info("Tiempo Estimado del Proceso  Cron sincronizadorD  ==> "+ ((new Double((tiempoFinal-tiempoInicial))/1000)/60)+" minutos");
