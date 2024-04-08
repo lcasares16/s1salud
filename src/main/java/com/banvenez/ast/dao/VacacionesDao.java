@@ -2,6 +2,7 @@ package com.banvenez.ast.dao;
 
 
 import com.banvenez.ast.dto.Mappers.VacacionesMappers;
+import com.banvenez.ast.dto.Vacaciones.VacacionesDTO;
 import com.banvenez.ast.dto.respuestaIntranetDto;
 import lombok.extern.slf4j.Slf4j;
 import oracle.jdbc.OracleTypes;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -31,7 +33,7 @@ public class VacacionesDao {
         respuestaIntranetDto resp =  new respuestaIntranetDto();
         try {
             SimpleJdbcCall simpleJdbcCall = new SimpleJdbcCall(jdbcTemplate);
-            simpleJdbcCall.withFunctionName("PKG_ASISTENCIA_UTIL.PRC_INSERTAR_DATA_CARNET");
+            simpleJdbcCall.withFunctionName("PKG_VAC_CONSULTAS.PRC_CONSULTAR_SOLICITUDES_VEN");
             simpleJdbcCall.withoutProcedureColumnMetaDataAccess();
             simpleJdbcCall.setFunction(false);
             simpleJdbcCall.declareParameters(
@@ -39,8 +41,8 @@ public class VacacionesDao {
                     new SqlOutParameter("P_Mensajes", OracleTypes.VARCHAR),
                     new SqlOutParameter("P_Resultado", OracleTypes.CURSOR)
             );
-
             simpleJdbcCall.returningResultSet("P_Resultado", new VacacionesMappers());
+
             Map<String, Object> resultMap = simpleJdbcCall.execute();
             resp.setEstatus((String) resultMap.get("P_CodResp"));
             resp.setMensaje((String) resultMap.get("P_Mensajes"));

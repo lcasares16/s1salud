@@ -17,6 +17,7 @@ public class ConexionesServicios {
     public WebClient servicioLdap(){
         try {
             String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoLdapWs, Constantes.parametroLdaWs);
+            log.info(endPoint);
             WebClient clienteLdap = WebClient.builder().baseUrl(endPoint).build();
             return clienteLdap;
         }catch (Exception e){
@@ -32,6 +33,18 @@ public class ConexionesServicios {
         try {
             String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoPeopleWs, Constantes.parametroIntWs);
             WebClient clienteLdap = WebClient.builder().baseUrl(endPoint).build();
+            return clienteLdap;
+        }catch (Exception e){
+            log.error("ConexionServiciosWeb:servicioIntranet =>");
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+    @Bean
+    public WebClient servicioLocal(){
+        try {
+            WebClient clienteLdap = WebClient.builder().baseUrl("http://localhost:8085/int-servicios/").build();
             return clienteLdap;
         }catch (Exception e){
             log.error("ConexionServiciosWeb:servicioIntranet =>");

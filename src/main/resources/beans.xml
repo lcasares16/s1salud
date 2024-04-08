@@ -23,10 +23,7 @@
             <property name="url" value="jdbc:oracle:thin:ASISTENCIA/ASISTENCIA@180.183.112.78:1560:INTRNETD"/>
         </bean>
 
-        <bean id="dataSourceAst"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-            <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
-            <property name="url" value="jdbc:oracle:thin:ASISTENCIA/ASISTENCIA@180.183.112.78:1560:INTRNETD"/>
-        </bean>
+
 
         <bean id="dataSourceVAC" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
             <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>

@@ -4,6 +4,7 @@ import com.banvenez.ast.dao.IntranetcorpDao;
 import com.banvenez.ast.dao.VacacionesDao;
 import com.banvenez.ast.dto.Intranet.CorreoDto;
 import com.banvenez.ast.dto.Ldap.EntradaDTO;
+import com.banvenez.ast.dto.Ldap.LoginDto;
 import com.banvenez.ast.dto.Ldap.RespuestaDto;
 import com.banvenez.ast.dto.Ldap.UsuarioDto;
 import com.banvenez.ast.dto.Vacaciones.VacacionesDTO;
@@ -36,15 +37,18 @@ public class VacacionesService {
             // llamamos a las solicitudes pendientes por vencer
             respuestaIntranetDto solicitudes = daoVacaciones.consultarSolicitudesPorVencer();
 
-            if(solicitudes.getEstatus().equalsIgnoreCase("SUCCESS") && resp.getData() != null){
+            if(solicitudes.getEstatus().equalsIgnoreCase("SUCCESS")){
                 // aqui casteamos las solicitudes
-                List<VacacionesDTO> solicitudesLts = (List<VacacionesDTO>) resp.getData();
+                List<VacacionesDTO> solicitudesLts = (List<VacacionesDTO>) solicitudes.getData();
 
                 for (VacacionesDTO  solicitud:  solicitudesLts) {
                     // aqui buscamos la informacion del supervisor para enviar el correo
-                    UsuarioDto supervisor =  this.obtenerDatosSupervisor(solicitud.getCodigoUsuarioSupervisor());
+                    log.info(solicitud.getCodigoUsuarioSupervisor());
+                    UsuarioDto supervisor = new UsuarioDto();
+                    supervisor =  this.obtenerDatosSupervisor(solicitud.getCodigoUsuarioSupervisor());
                     // aqui enviamos el corrreo
                     this.envioCorreo(supervisor, solicitud);
+                    resp.setEstatus("SUCCESS");
                 }
             }else{
                 resp.setEstatus("WARNING");
@@ -63,17 +67,19 @@ public class VacacionesService {
         UsuarioDto resp = new UsuarioDto();
         try {
 
-            EntradaDTO jsonEntrada = new EntradaDTO();
+            LoginDto jsonEntrada = new LoginDto();
             jsonEntrada.setCodUsuario(codigoUsuario);
             RespuestaDto respLogin = servicios.servicioLdap().post()
-                    .uri("obtenerPlantilla")
+                    .uri("consultarUsuario")
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(jsonEntrada), EntradaDTO.class)
+                    .body(Mono.just(jsonEntrada), LoginDto.class)
                     .exchange()
                     .block()
                     .bodyToMono(RespuestaDto.class)
                     .doOnError(e -> log.error("Error obtenerDatosSupervisor => ", e))
                     .block();
+            log.info(respLogin.toString());
+            resp = respLogin.getUsuario();
         }catch (Exception e){
             log.error("VacacionesService:obtenerDatosSupervisor mensaje ==>");
             log.error(e.getMessage());
@@ -92,17 +98,19 @@ public class VacacionesService {
         String continuacionMensajeS   = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.acronimoAplicacion,Constantes.continuacionMensajeS );
 
         String mensaje = mensajeEntranda +  user.getNombres() + " "+ user.getApellidos() + mensajeSupervisor +
-                      "<strong>"+ solicitud.getNombresSupervisor() + "</strong> cédula <strong>"+
+                      "<strong>"+ solicitud.getNombres() + "</strong> cédula <strong>"+
                       solicitud.getCedula() +" " +  solicitud.getCodigoUsuario()  +"</strong> " +
                        continuacionMensajeS;
 
         CorreoDto correo = new CorreoDto();
-        correo.setRemitente(user.getCorreo());
+        correo.setRemitente(buzon);
         correo.setAsunto(asuntoAprobacionCorreo);
         correo.setDestino(user.getCorreo());
         correo.setMensaje(mensaje);
 
-        RespuestaDto resp = servicios.servicioIntranet().post()
+        log.info(correo.toString());
+
+        RespuestaDto resp = servicios.servicioLocal().post()
                 .uri("envioCorreo")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Mono.just(correo), CorreoDto.class)

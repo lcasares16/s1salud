@@ -25,6 +25,6 @@ public class VacacionesMappers implements RowMapper<VacacionesDTO> {
             resp.setFechaVacaciones(rs.getString("FECHA_VACACIONES"));
             resp.setCantidadDias(rs.getInt("CANTIDAD_DIAS"));
             resp.setEstatusSolicitud(rs.getString("ESTATUS_SOLICITUD"));
-        return null;
+        return resp;
     }
 }

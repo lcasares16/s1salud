@@ -44,7 +44,7 @@ public class AstWSApplication {
     }
 
 
-
+    @Scheduled(cron="${cron.vacaciones}")
     public void notificacionesVacaciones(){
         long tiempoInicial = System.currentTimeMillis();
         long tiempoFinal = 0;
