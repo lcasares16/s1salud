@@ -23,10 +23,10 @@ public class CarnetDao {
     private ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
     private JdbcTemplate jdbcTemplate;
 
-//    public CarnetDao(){
-//        super();
-//        this.jdbcTemplate = (JdbcTemplate) context.getBean("jdbctemplateCarnet");
-//    }
+    public CarnetDao(){
+        super();
+        this.jdbcTemplate = (JdbcTemplate) context.getBean("jdbctemplateCarnet");
+    }
 
     public List<carnetDto> obternerRegistros(String fechaInicio, String fechaFin){
         List<carnetDto> resp = new ArrayList<carnetDto>();
