@@ -52,4 +52,58 @@ public class ConexionesServicios {
             return null;
         }
     }
+
+    @Bean
+    public WebClient servicioDsc(){
+        try {
+
+            String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoDscWs, Constantes.parametroDscWs);
+            log.info(endPoint);
+            WebClient clienteLdap = WebClient.builder().baseUrl(endPoint).build();
+
+           // WebClient clienteLdap = WebClient.builder().baseUrl("http://180.183.170.77:30324/dcs-get-transaction/v1/").build();
+            return clienteLdap;
+        }catch (Exception e){
+            log.error("ConexionServiciosWeb:servicioIntranet =>");
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+    @Bean
+    public WebClient servicioPci(){
+        try {
+
+            String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoPciWs, Constantes.parametroPciWs);
+            log.info(endPoint);
+            WebClient clienteLdap = WebClient.builder().baseUrl(endPoint).build();
+
+            // WebClient clienteLdap = WebClient.builder().baseUrl("http://180.183.170.77:30324/dcs-get-transaction/v1/").build();
+            return clienteLdap;
+        }catch (Exception e){
+            log.error("ConexionServiciosWeb:servicioIntranet =>");
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+
+    @Bean
+    public WebClient servicioPeople(){
+        try {
+
+            String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoPeoplesWs, Constantes.parametroPeopleWs);
+            log.info(endPoint);
+            WebClient clienteLdap = WebClient.builder().baseUrl(endPoint).build();
+
+            // WebClient clienteLdap = WebClient.builder().baseUrl("http://180.183.170.77:30324/dcs-get-transaction/v1/").build();
+            return clienteLdap;
+        }catch (Exception e){
+            log.error("ConexionServiciosWeb:servicioIntranet =>");
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+
 }

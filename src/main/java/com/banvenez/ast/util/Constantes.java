@@ -20,6 +20,18 @@ public class Constantes {
     public static String contextoPeopleWs = "INT_WS";
     public static String parametroIntWs = "URL_WS_INT_12C";
 
+    /******************************* Parametros Sorteo DSC*******************************/
+    public static String contextoDscWs = "INM_SORTEO";
+    public static String parametroDscWs = "URL_WS_INT_DSC";
+
+    /******************************* Parametros Sorteo PCI*******************************/
+    public static String contextoPciWs = "URL_WS_INM_PCI";
+    public static String parametroPciWs = "INM_SORTEO_PCI";
+
+
+    /******************************* Parametros Sorteo PEOPLE*******************************/
+    public static String contextoPeoplesWs = "INM_SORTEO_PEOPLE";
+    public static String parametroPeopleWs = "URL_WS_INM_PEOPLES";
 
 
     //	correo envio mensajes
