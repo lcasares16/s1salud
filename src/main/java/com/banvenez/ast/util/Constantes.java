@@ -30,8 +30,13 @@ public class Constantes {
 
 
     /******************************* Parametros Sorteo PEOPLE*******************************/
-    public static String contextoPeoplesWs = "INM_SORTEO_PEOPLE";
-    public static String parametroPeopleWs = "URL_WS_INM_PEOPLES";
+    public static String contextoPeopWs = "INM_SORTEO_PEOPLE";
+    public static String parametroPeopWs = "URL_WS_INM_PEOPLES";
+
+
+    /******************************* Parametros Sorteo PUSH*******************************/
+    public static String contextoPush = "INM_SORTEO_PUSH";
+    public static String parametroPush = "URL_WS_INM_PUSH";
 
 
     //	correo envio mensajes

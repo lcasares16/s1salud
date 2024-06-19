@@ -92,7 +92,7 @@ public class ConexionesServicios {
     public WebClient servicioPeople(){
         try {
 
-            String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoPeoplesWs, Constantes.parametroPeopleWs);
+            String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoPeopWs, Constantes.parametroPeopWs);
             log.info(endPoint);
             WebClient clienteLdap = WebClient.builder().baseUrl(endPoint).build();
 

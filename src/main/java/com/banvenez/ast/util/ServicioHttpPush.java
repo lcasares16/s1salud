@@ -1,9 +1,10 @@
 package com.banvenez.ast.util;
 
+
 import com.banvenez.ast.dao.IntranetcorpDao;
-import com.banvenez.ast.dto.Sorteo.DataPagosDto;
 import com.banvenez.ast.dto.Sorteo.EntradaTrab;
-import com.banvenez.ast.dto.Sorteo.RespuestPCIDto;
+import com.banvenez.ast.dto.Sorteo.EnvioPushDTO;
+import com.banvenez.ast.dto.Sorteo.ResulatdoPushDTO;
 import com.banvenez.ast.dto.Sorteo.ResultadoTrab;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -23,26 +24,25 @@ import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
 
-
 @Service
 @Slf4j
-public class ServicioTrabHttp {
+public class ServicioHttpPush {
 
     ConexionesServicios servicios = new ConexionesServicios();
     private IntranetcorpDao daoIntranet = new IntranetcorpDao();
 
-    public ResultadoTrab peopleTraba(EntradaTrab jsonEntrada){
+    public ResulatdoPushDTO PushMensaje(EnvioPushDTO jsonEntrada){
 
-        ResultadoTrab resp = new ResultadoTrab();
+        ResulatdoPushDTO resp = new ResulatdoPushDTO();
         try {
             TrustStrategy acceptingTrustStrategy = new TrustSelfSignedStrategy();
             SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy)
                     .build();
             SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
 
-            String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoPeopWs, Constantes.parametroPeopWs);
+            String endPoint = daoIntranet.obtenerParametros(Constantes.contextoParametro, Constantes.contextoPush, Constantes.parametroPush);
 
-            HttpPost post = new HttpPost(endPoint + "/PeopleSoft/DatosActivo");
+            HttpPost post = new HttpPost(endPoint + "bdvApp-push/envioNotificacion");
 
 /// dcs
             try {
@@ -64,11 +64,11 @@ public class ServicioTrabHttp {
                 log.info("Json de Salida " + responseString);
 
                 Gson gson = new Gson();
-                resp = gson.fromJson(responseString, ResultadoTrab.class);
+                resp = gson.fromJson(responseString, ResulatdoPushDTO.class);
 
                 ObjectMapper mapper = new ObjectMapper();
 
-                ResultadoTrab obj = mapper.readValue(responseString, ResultadoTrab.class);
+                ResulatdoPushDTO obj = mapper.readValue(responseString, ResulatdoPushDTO.class);
 
 
 

@@ -5,10 +5,10 @@ import com.banvenez.ast.dao.IntranetcorpDao;
 import com.banvenez.ast.dao.SorteoInmDao;
 import com.banvenez.ast.dto.Sorteo.*;
 import com.banvenez.ast.util.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import jdk.internal.org.objectweb.asm.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -51,6 +51,14 @@ public class ServicioDscStoAction {
     SorteoInmDao daoMultiInm = new SorteoInmDao();
 
     private DatosPagoPDto sorteoCandidatos = new DatosPagoPDto();
+    private SorteoInmPDTO consultaSorteo = new SorteoInmPDTO();
+
+    private String jsonEnviado;
+
+    private String jsonRespuesta;
+
+    private RespuestaGanDTO consultaGan = new RespuestaGanDTO();
+
 
     List<DataPagosDto> pagos = new ArrayList<DataPagosDto>();
 
@@ -103,8 +111,8 @@ public class ServicioDscStoAction {
                 log.info("Json de Salida " + responseString);
 
                 Gson gson = new Gson();
-
                 resp = gson.fromJson(responseString, SalidaJsonDscDto.class);
+
                 ObjectMapper mapper = new ObjectMapper();
 
                 SalidaJsonDscDto obj = mapper.readValue(responseString, SalidaJsonDscDto.class);
@@ -112,10 +120,10 @@ public class ServicioDscStoAction {
 
 
                 resp = new SalidaJsonDscDto();
+
+
                 for (data  candidatos:obj.getData()) {
                     // condiciones  dao
-
-
                     sorteoCandidatos =  daoMultiInm.consultarParametro(candidatos.getAmount(),
                                                                       candidatos.getChannelCode(),
                                                                       candidatos.getBankOrigin(),
@@ -125,6 +133,9 @@ public class ServicioDscStoAction {
                                                                       candidatos.getAccountOrigin(),
                                                                       candidatos.getReferenc()
                                                                      );
+
+
+
                     log.info("Envio de informacion BD " + sorteoCandidatos);
 
 
@@ -133,34 +144,58 @@ public class ServicioDscStoAction {
 
                     if(sorteoCandidatos.getPagosLst() != null) {
 
-                        Object json = new Gson().toJson(sorteoCandidatos.getPagosLst());
-                        Integer ced =   candidatos.getCustomerOrigin();
-                      //  ResultadoTrab respPeople = serPeople.peopleTraba(ced);
+                            //Consulta Sorteos
+
+                               consultaSorteo =  daoMultiInm.consultarSorteo();
+
+                                Integer numeroSorteo = consultaSorteo.getSorteoLst().get(0).getId_sorteo_pk();
+
+                            //Consulta si el ganador esta en el mismo sorteo de ser asi no puede participar
+
+                                consultaGan = daoMultiInm.consultaGanador(numeroSorteo,candidatos.getCustomerOrigin());
+
+                                RespuestaGanDTO valida = new RespuestaGanDTO();
+                                valida.setP_resultado(consultaGan.getP_resultado());
+
+                                EntradaTrab traba = new EntradaTrab();
+                                traba.setCedula(Integer.toString(candidatos.getCustomerOrigin()));
+
+                            //Consulta si es trabajador
+                             ResultadoTrab respPeople = serPeople.peopleTraba(traba);
+                             // /*&&  respPeople.getDatosTrab() == null*/
+
+                                if(consultaGan.getP_resultado() == 1 &&  respPeople.getDatosTrab() == null){
+
+                                   RespuestPCIDto respPic = serPic.pagoPic(sorteoCandidatos.getPagosLst().get(0));
+
+                                   if(respPic.getCode() == 1000){
+                                       jsonEnviado = sorteoCandidatos.toString();
+                                       jsonRespuesta = respPic.toString();
 
 
-                        RespuestPCIDto respPic = serPic.pagoPic(sorteoCandidatos.getPagosLst().get(0));
+                                       sorteoCandidatos =  daoMultiInm.insertaGanador
+                                               (candidatos.getAmount(),
+                                                       candidatos.getChannelCode(),
+                                                       candidatos.getBankOrigin(),
+                                                       candidatos.getBankDestination(),
+                                                       "V",
+                                                       candidatos.getCustomerOrigin(),
+                                                       candidatos.getAccountOrigin(),
+                                                       1,
+                                                       candidatos.getReferenc(),
+                                                       candidatos.getAmountCommission(),
+                                                       jsonEnviado,
+                                                       jsonRespuesta
+                                               );
+                                       log.info("Hubo Ganador del sorteo   "+ numeroSorteo + candidatos.getCustomerOrigin());
 
-                        if(respPic.getCode() == 1000){
-                            sorteoCandidatos =  daoMultiInm.insertaGanador
-                                    (candidatos.getAmount(),
-                                            candidatos.getChannelCode(),
-                                            candidatos.getBankOrigin(),
-                                            candidatos.getBankDestination(),
-                                            "V",
-                                            candidatos.getCustomerOrigin(),
-                                            candidatos.getAccountOrigin(),
-                                            candidatos.getReferenc()
-                                    );
+                                       break;
 
+                                   }
 
-                            break;
-
-                        }
-
+                                }
 
                     }
-
-
 
                 }
                 resp = gson.fromJson(responseString, SalidaJsonDscDto.class);
@@ -171,17 +206,6 @@ public class ServicioDscStoAction {
             } catch (Exception e) {
                 log.error("fallo respuesta => " + e.getMessage());
             }
-
-//            SalidaJsonDscDto resp = servicios.servicioDsc().post()
-//                    .uri("getTrasactionSorteo")
-//                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                    .body(Mono.just(jsonEntrada), JsonDscDTO.class)
-//                    .exchange()
-//                    .block()
-//                    .bodyToMono(SalidaJsonDscDto.class)
-//                    .doOnError(e -> log.error("Error busquedaValidarUsuario => ", e.getMessage()))
-//                    .block();
-
 
         } catch (Exception e) {
             log.error("Excepcion en la clase y metodo " + ServicioDscStoAction.class.getName() + " obtenerMenu ");

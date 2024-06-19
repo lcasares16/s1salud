@@ -19,7 +19,7 @@ public class DataPagoMappers implements RowMapper<DataPagosDto> {
             resp.setCuentaDestino(rs.getString("cuentaDestino"));
             resp.setNio(rs.getString("nio"));
             resp.setNroMovimientoAnulacion(rs.getInt("nroMovimientoAnulacion"));
-            resp.setMonto(rs.getInt("monto"));
+            resp.setMonto(rs.getDouble("monto"));
             resp.setSerial(rs.getString("serial"));
             resp.setCodOperacionDebito(rs.getString("codOperacionDebito"));
             resp.setCodOperacionCredito(rs.getString("codOperacionCredito"));
