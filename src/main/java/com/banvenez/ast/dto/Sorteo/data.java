@@ -2,6 +2,8 @@ package com.banvenez.ast.dto.Sorteo;
 
 import lombok.Data;
 
+import java.sql.Blob;
+
 @Data
 public class data {
     public String channelCode;
@@ -16,5 +18,6 @@ public class data {
     public String instrumentDestination;
     public String accountOrigin;
     public String accountDestination;
+    public double amountCommission;
 
 }

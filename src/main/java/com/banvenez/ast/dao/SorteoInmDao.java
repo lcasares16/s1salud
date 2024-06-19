@@ -1,9 +1,7 @@
 package com.banvenez.ast.dao;
 
-import com.banvenez.ast.dto.Mappers.DataPagoMappers;
-import com.banvenez.ast.dto.Sorteo.DataPagosDto;
-import com.banvenez.ast.dto.Sorteo.DatosPagoPDto;
-import com.banvenez.ast.dto.Sorteo.SalidaJsonDscDto;
+import com.banvenez.ast.dto.Mappers.*;
+import com.banvenez.ast.dto.Sorteo.*;
 import com.banvenez.ast.dto.respuestaIntranetDto;
 import com.banvenez.ast.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +16,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Blob;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +111,7 @@ public class SorteoInmDao {
             simpleJdbcIntranet.setFunction(false);
 
             simpleJdbcIntranet.declareParameters(
-                    new SqlParameter("p_monto_eva", OracleTypes.DOUBLE),
+                    new SqlParameter("p_monto_eva", OracleTypes.VARCHAR),
                     new SqlParameter("p_canal_eva", OracleTypes.VARCHAR),
                     new SqlParameter("p_bco_ori_eva", OracleTypes.VARCHAR),
                     new SqlParameter("p_bco_des_eva", OracleTypes.VARCHAR),
@@ -144,12 +143,7 @@ public class SorteoInmDao {
             resp.setPagosLst(((List<DataPagosDto>) result.get("p_pagos_parametro")));
 
 
-            //if(resp.getEstatus().equalsIgnoreCase(Constantes.success)){
-            //  log.info(SorteoInmDao.class.getName() + " guardarTasaBcv Exitoso");
-            //}else{
-            //  log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
-            //  log.error(resp.getMensaje());
-            //}
+
 
         }catch (Exception e){
             log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
@@ -161,8 +155,8 @@ public class SorteoInmDao {
 
 
 
-    public DatosPagoPDto insertaGanador(Double amount, String channelCode,String bankOrigin,String bankDestination, String tipoId,
-                                            Integer customerOrigin,String accountOrigin,String referen) {
+    public DatosPagoPDto insertaGanador(Double amount, String channelCode, String bankOrigin, String bankDestination, String tipoId,
+                                        Integer customerOrigin, String accountOrigin, Integer crono , String referen, Double comiS, String jsonentrada, String jsonRespuesta) {
         DatosPagoPDto resp = new DatosPagoPDto();
         //    moneda = moneda.replace(".", ",");
         try {
@@ -179,6 +173,10 @@ public class SorteoInmDao {
                     new SqlParameter("p_tipo_ide_eva", OracleTypes.VARCHAR),
                     new SqlParameter("p_cedula_eva", OracleTypes.INTEGER),
                     new SqlParameter("p_cuentaDestino_pgo", OracleTypes.VARCHAR),
+                    new SqlParameter("p_cronograma", OracleTypes.INTEGER),
+                    new SqlParameter("p_comision", OracleTypes.DOUBLE),
+                    new SqlParameter("p_json_entrada", OracleTypes.CLOB),
+                    new SqlParameter("p_json_respuesta", OracleTypes.CLOB),
                     new SqlParameter("p_reference_pago", OracleTypes.VARCHAR)
 
             );
@@ -193,15 +191,44 @@ public class SorteoInmDao {
                     .addValue("p_tipo_ide_eva", tipoId)
                     .addValue("p_cedula_eva", customerOrigin)
                     .addValue("p_cuentaDestino_pgo", accountOrigin)
-                    .addValue("p_reference_pago", referen);
+                    .addValue("p_cronograma", crono)
+                    .addValue("p_reference_pago", referen)
+                    .addValue("p_json_entrada", jsonentrada)
+                    .addValue("p_json_respuesta", jsonRespuesta)
+                    .addValue("p_comision", comiS);
 
 
 
             Map<String, Object> result = simpleJdbcIntranet.execute(sqlParameterSource);
-            // resp.setRespuesta((List<DatosPagoPDto>) result.get("P_CodResp"));
-            // resp.setRespuesta(((List<DatosPagoPDto>) result.get("P_CodResp_Resp")));
-            //resp = ((List<DataPagosDto>) result.get("p_pagos_parametro"));
-           // resp.setPagosLst(((List<DataPagosDto>) result.get("p_pagos_parametro")));
+
+
+        }catch (Exception e){
+            log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
+            log.error("Mensaje => " + e.getMessage());
+        }
+        return resp;
+
+    }
+
+
+    public SorteoInmPDTO consultarSorteo() {
+        SorteoInmPDTO resp = new SorteoInmPDTO();
+        //    moneda = moneda.replace(".", ",");
+        try {
+            SimpleJdbcCall simpleJdbcIntranet = new SimpleJdbcCall(jdbcTemplate);
+            simpleJdbcIntranet.withFunctionName("PKG_PAGOS_M_SORTEO_UTIL.PRC_CONSULTAR_SORTEO_ACTIVO");
+            simpleJdbcIntranet.withoutProcedureColumnMetaDataAccess();
+            simpleJdbcIntranet.setFunction(false);
+
+            simpleJdbcIntranet.declareParameters(
+                     new SqlOutParameter("p_pagos_sorteo", OracleTypes.CURSOR)
+            );
+
+            simpleJdbcIntranet.returningResultSet("p_pagos_sorteo", new SorteoMapper());
+
+
+            Map<String, Object> result = simpleJdbcIntranet.execute();
+            resp.setSorteoLst(((List<sorteoInmDTO>) result.get("p_pagos_sorteo")));
 
 
             //if(resp.getEstatus().equalsIgnoreCase(Constantes.success)){
@@ -219,6 +246,227 @@ public class SorteoInmDao {
 
     }
 
+    public RespuestaGanDTO consultaGanador(Integer idSorteo, Integer cedula){
+        RespuestaGanDTO resp = new RespuestaGanDTO();
+
+        try {
+            SimpleJdbcCall simpleJdbcIntranet = new SimpleJdbcCall(jdbcTemplate);
+            simpleJdbcIntranet.withFunctionName("PKG_PAGOS_M_SORTEO_UTIL.PRC_CONSULTAR_GAN_SORTEO");
+            simpleJdbcIntranet.withoutProcedureColumnMetaDataAccess();
+            simpleJdbcIntranet.setFunction(false);
+
+            simpleJdbcIntranet.declareParameters(
+                    new SqlParameter("p_id_sorteo", OracleTypes.VARCHAR),
+                    new SqlParameter("p_cedula", OracleTypes.VARCHAR),
+                    new SqlOutParameter("p_resultado", OracleTypes.INTEGER)
+            );
+
+            SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
+                    .addValue("p_id_sorteo", idSorteo)
+                    .addValue("p_cedula", cedula);
+
+
+            Map<String, Object> result = simpleJdbcIntranet.execute(sqlParameterSource);
+            resp.setP_resultado((Integer) result.get("p_resultado"));
+
+
+//            if(resp.getP_resultado().equalsIgnoreCase(Constantes.success)){
+//                log.info(SorteoInmDao.class.getName() + " Envia true si existe el ganador dentro del mismo sorteo");
+//            }
+
+        }catch (Exception e){
+            log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
+            log.error("Mensaje => " + e.getMessage());
+        }
+        return resp;
+    }
+
+    public CronogramaPDTO consultarCronogramaSto(String HoraParametro) {
+        CronogramaPDTO resp = new CronogramaPDTO();
+
+        //    moneda = moneda.replace(".", ",");
+        try {
+            SimpleJdbcCall simpleJdbcIntranet = new SimpleJdbcCall(jdbcTemplate);
+            simpleJdbcIntranet.withFunctionName("PKG_PAGOS_M_SORTEO_UTIL.PRC_CONSULTA_CRONOGRAMA_STO");
+            simpleJdbcIntranet.withoutProcedureColumnMetaDataAccess();
+            simpleJdbcIntranet.setFunction(false);
+
+            simpleJdbcIntranet.declareParameters(
+                    new SqlParameter("p_hora_cronograma", OracleTypes.VARCHAR),
+                    new SqlOutParameter("p_cod_producto", OracleTypes.CURSOR),
+                    new SqlOutParameter("p_cronograma_sorteo", OracleTypes.CURSOR)
+            );
+
+            simpleJdbcIntranet.returningResultSet("p_cronograma_sorteo", new CronogramaMapper());
+            simpleJdbcIntranet.returningResultSet("p_cod_producto", new CronogramaParMapper());
+
+            SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
+                    .addValue("p_hora_cronograma", HoraParametro);
+
+
+            Map<String, Object> result = simpleJdbcIntranet.execute(sqlParameterSource);
+            resp.setCronoParLst(((List<CronoParDatosDTO>) result.get("p_cod_producto")));
+            resp.setCronoLst(((List<JsonCronogramaDTO>) result.get("p_cronograma_sorteo")));
+
+
+
+        }catch (Exception e){
+            log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
+            log.error("Mensaje => " + e.getMessage());
+        }
+        return resp;
+
+    }
+
+    public RepuestaActCronDTO actualizaCronogramaSto(Integer idCrono, String idUpdate) {
+
+        RepuestaActCronDTO resp = new RepuestaActCronDTO();
+
+        //    moneda = moneda.replace(".", ",");
+        try {
+            SimpleJdbcCall simpleJdbcIntranet = new SimpleJdbcCall(jdbcTemplate);
+            simpleJdbcIntranet.withFunctionName("PKG_PAGOS_M_SORTEO_UTIL.PRC_ACTUALIZO_CRONOGRAMA_STO");
+            simpleJdbcIntranet.withoutProcedureColumnMetaDataAccess();
+            simpleJdbcIntranet.setFunction(false);
+
+            simpleJdbcIntranet.declareParameters(
+                    new SqlParameter("p_id_cronograma", OracleTypes.INTEGER),
+                    new SqlParameter("p_update", OracleTypes.VARCHAR),
+                    new SqlOutParameter("p_resultado", OracleTypes.INTEGER)
+
+            );
+
+
+
+            SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
+                    .addValue("p_id_cronograma", idCrono)
+                    .addValue("p_update", idUpdate);
+
+
+
+
+            Map<String, Object> result = simpleJdbcIntranet.execute(sqlParameterSource);
+            resp.setPResultado((Integer) result.get("p_resultado"));
+
+
+            //if(resp.getEstatus().equalsIgnoreCase(Constantes.success)){
+            //  log.info(SorteoInmDao.class.getName() + " guardarTasaBcv Exitoso");
+            //}else{
+            //  log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
+            //  log.error(resp.getMensaje());
+            //}
+
+        }catch (Exception e){
+            log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
+            log.error("Mensaje => " + e.getMessage());
+        }
+        return resp;
+
+    }
+
+
+    public RepuestaActCronDTO cierraSorteo(Integer idSorteo) {
+
+        RepuestaActCronDTO resp = new RepuestaActCronDTO();
+
+        //    moneda = moneda.replace(".", ",");
+        try {
+            SimpleJdbcCall simpleJdbcIntranet = new SimpleJdbcCall(jdbcTemplate);
+            simpleJdbcIntranet.withFunctionName("PKG_PAGOS_M_SORTEO_UTIL.PRC_CIERRA_STO");
+            simpleJdbcIntranet.withoutProcedureColumnMetaDataAccess();
+            simpleJdbcIntranet.setFunction(false);
+
+            simpleJdbcIntranet.declareParameters(
+                    new SqlParameter("p_id_sorteo", OracleTypes.INTEGER),
+                    new SqlOutParameter("p_resultado", OracleTypes.INTEGER)
+
+            );
+
+          SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
+                    .addValue("p_id_sorteo", idSorteo);
+
+
+            Map<String, Object> result = simpleJdbcIntranet.execute(sqlParameterSource);
+            resp.setPResultado((Integer) result.get("p_resultado"));
+
+
+        }catch (Exception e){
+            log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
+            log.error("Mensaje => " + e.getMessage());
+        }
+        return resp;
+
+    }
+
+
+    public RepuestaActCronDTO cuentaCronograma(Integer idSorteo) {
+
+        RepuestaActCronDTO resp = new RepuestaActCronDTO();
+
+        //    moneda = moneda.replace(".", ",");
+        try {
+            SimpleJdbcCall simpleJdbcIntranet = new SimpleJdbcCall(jdbcTemplate);
+            simpleJdbcIntranet.withFunctionName("PKG_PAGOS_M_SORTEO_UTIL.PRC_CUENTA_CRONOGRAMA");
+            simpleJdbcIntranet.withoutProcedureColumnMetaDataAccess();
+            simpleJdbcIntranet.setFunction(false);
+
+            simpleJdbcIntranet.declareParameters(
+                    new SqlParameter("p_id_sorteo", OracleTypes.INTEGER),
+                    new SqlOutParameter("p_resultado", OracleTypes.INTEGER)
+
+            );
+
+            SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
+                    .addValue("p_id_sorteo", idSorteo);
+
+
+            Map<String, Object> result = simpleJdbcIntranet.execute(sqlParameterSource);
+            resp.setPResultado((Integer) result.get("p_resultado"));
+
+
+        }catch (Exception e){
+            log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
+            log.error("Mensaje => " + e.getMessage());
+        }
+        return resp;
+
+    }
+
+
+
+    public ParametroPDTO obtenerDatos() {
+
+        ParametroPDTO resp = new ParametroPDTO();
+
+
+        try {
+            SimpleJdbcCall simpleJdbcIntranet = new SimpleJdbcCall(jdbcTemplate);
+            simpleJdbcIntranet.withFunctionName("PKG_PAGOS_M_SORTEO_UTIL.PRC_CONSULTA_PARAMETROS");
+            simpleJdbcIntranet.withoutProcedureColumnMetaDataAccess();
+            simpleJdbcIntranet.setFunction(false);
+
+            simpleJdbcIntranet.declareParameters(
+
+                    new SqlOutParameter("p_parametros_sorteo", OracleTypes.CURSOR)
+
+            );
+
+            simpleJdbcIntranet.returningResultSet("p_parametros_sorteo", new planCronoMapper());
+           // simpleJdbcIntranet.returningResultSet("horaFin", new planCronoMapper());
+
+
+            Map<String, Object> result = simpleJdbcIntranet.execute();
+          //  resp.setLstPara((String) result.get("p_parametros_sorteo"));
+
+            resp.setLstPara(((List<ParametrosEntDTO>) result.get("p_parametros_sorteo")));
+
+        }catch (Exception e){
+            log.error("Excepcion en la clase y metodo " + SorteoInmDao.class.getName() + " guardarTasaBcv ");
+            log.error("Mensaje => " + e.getMessage());
+        }
+        return resp;
+
+    }
 
 
 }

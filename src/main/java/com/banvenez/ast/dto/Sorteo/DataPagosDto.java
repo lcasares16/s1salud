@@ -10,7 +10,7 @@ public class DataPagosDto {
     public String cuentaDestino;
     public String nio;
     public Integer nroMovimientoAnulacion;
-    public double monto;
+    public Double monto;
     public String serial;
     public String codOperacionDebito;
     public String codOperacionCredito;
