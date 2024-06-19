@@ -1,12 +1,12 @@
 package com.banvenez.ast.util;
 
 
-import com.banvenez.ast.dto.Bcv.MonedaDTO;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.banvenez.ast.dto.Bcv.MonedaDTO;
+import com.banvenez.ast.dto.Intranet.CorreoDto;
+import com.banvenez.ast.dto.Intranet.RespuestaDto;
 import lombok.extern.slf4j.Slf4j;
+
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,47 +20,38 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
-import org.jdom2.filter.ElementFilter;
-import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+import reactor.core.publisher.Mono;
 
 import javax.net.ssl.SSLContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
+
 
 
 @Slf4j
 @Service
 public class ServicosHttps {
 
+    @Autowired
+    ConexionesServicios servicios;
 
     public MonedaDTO servicioBcv()   {
-
+        CorreoDto correo =  new CorreoDto();
+        correo.setDestino("intranet_bdv@banvenez.com");
+        correo.setRemitente("intranet_bdv@banvenez.com");
         try {
             TrustStrategy acceptingTrustStrategy = new TrustSelfSignedStrategy();
             SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy)
                     .build();
             SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
             HttpPost httpPost =
-                    new HttpPost("https://casacambioserv-cert.extra.bcv.org.ve/service/autorizacion");
+                    new HttpPost("https://casacambioserv.extra.bcv.org.ve/service/autorizacion");
             httpPost.addHeader("content-type", "text/xml;charset=utf-8");
 
             StringBuffer buffer = new StringBuffer();
@@ -83,6 +74,9 @@ public class ServicosHttps {
             String responseString = EntityUtils.toString(entity, "UTF-8");
             responseString = responseString.replaceAll("&lt;", "<");
             responseString = responseString.replaceAll("&gt;", ">");
+
+            log.info("RESPUESTA BCV ==> ");
+            log.info(responseString);
             MonedaDTO moneda  = this.parseResponse(responseString);
             return moneda;
         }catch (Exception e){
@@ -98,8 +92,10 @@ public class ServicosHttps {
             Elements xmlRetorno = extractXmlElement(entity, "MONEDA");
             MonedaDTO moneda = new MonedaDTO();
             for (Element elemen : xmlRetorno ){
-                if(elemen.attribute("CODIGO").getValue().equalsIgnoreCase("USD")){
-                    moneda.setCodigo(elemen.attribute("CODIGO").getValue());
+              //  if(elemen.attributes.get("CODIGO").getValue().equalsIgnoreCase("USD")){
+
+                if(elemen.attributes().get("CODIGO").equalsIgnoreCase("USD")){
+                    moneda.setCodigo(elemen.attributes().get("CODIGO"));
                     moneda.setVenta(elemen.getElementsByTag("VENTA").text());
                     moneda.setCompra(elemen.getElementsByTag("COMPRA").text());
                     break;
@@ -118,6 +114,26 @@ public class ServicosHttps {
         ((org.jsoup.nodes.Document) document).outputSettings().prettyPrint(false);
         Elements retorno = document.getElementsByTag(nodeTagNameElement);
         return retorno;
+    }
+
+
+
+    public void enviarCorreos(CorreoDto correo){
+        try {
+            RespuestaDto respCorreo = servicios.servicioIntranet().post()
+                    .uri("/envioCorreo")
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(Mono.just(correo), CorreoDto.class)
+                    .exchange()
+                    .block()
+                    .bodyToMono(RespuestaDto.class)
+                    .doOnError(e -> log.error("Error enviarCorreos => ", e))
+                    .block();
+            log.info(respCorreo.getStatus());
+        }catch (Exception e){
+            log.error("SincronizarDataService:enviarCorreos mensaje=> ");
+            log.error(e.getMessage());
+        }
     }
 
 }

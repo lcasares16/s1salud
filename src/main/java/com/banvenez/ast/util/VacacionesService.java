@@ -110,7 +110,7 @@ public class VacacionesService {
 
         log.info(correo.toString());
 
-        RespuestaDto resp = servicios.servicioLocal().post()
+        RespuestaDto resp = servicios.servicioIntranet().post()
                 .uri("envioCorreo")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Mono.just(correo), CorreoDto.class)

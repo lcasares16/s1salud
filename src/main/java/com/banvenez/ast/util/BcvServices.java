@@ -6,11 +6,12 @@ import com.banvenez.ast.dto.Intranet.CorreoDto;
 import com.banvenez.ast.dto.Intranet.RespuestaDto;
 import com.banvenez.ast.dto.respuestaIntranetDto;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 
 @Slf4j
 @Service
@@ -34,8 +35,8 @@ public class BcvServices {
             MonedaDTO moneda =  httpsServicio.servicioBcv();
             resp = daoIntranet.guardarTasaBcv(moneda.getCodigo(), moneda.getCompra());
             correo.setAsunto("crontab bcv exitoso");
-            correo.setMensaje("la sincronización de la tasa del bcv ha sido exitosa tasa del dia " + moneda.getCompra());
-            if(resp.getEstatus().equalsIgnoreCase(Constantes.fail)){
+            correo.setMensaje("la sincronización de la tasa del bcv ha sido exitosa tasa del dia "+ moneda.getCodigo() +" " + moneda.getCompra());
+            if(moneda.getCompra() == null){
                 log.error("BcvServices:guardarTasaBcv "+ resp.getMensaje());
                 correo.setAsunto("crontab bcv fallo");
                 correo.setMensaje("proceso de crontab de bcv sincronizacion de la tasa moneda extranjera fallo para mayor informacion consultar el log," +

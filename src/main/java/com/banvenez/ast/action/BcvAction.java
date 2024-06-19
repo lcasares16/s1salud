@@ -26,11 +26,17 @@ public class BcvAction {
 
     @RequestMapping(path = "bcv", produces = "application/json")
     @Post
-    public void consultarTasasBcv(){
+    public respuestaIntranetDto consultarTasasBcv(){
+        respuestaIntranetDto resp = new respuestaIntranetDto();
         try {
             MonedaDTO moneda =  httpsServicio.servicioBcv();
-            respuestaIntranetDto resp = daoIntranet.guardarTasaBcv(moneda.getCodigo(), moneda.getCompra());
 
+            if(moneda.getVenta() != null){
+                 resp = daoIntranet.guardarTasaBcv(moneda.getCodigo(), moneda.getCompra());
+            }else{
+                resp.setEstatus(Constantes.fail);
+                resp.setMensaje("Falla al obtener la tasa del bcv");
+            }
             if(resp.getEstatus().equalsIgnoreCase(Constantes.fail)){
                 log.error("BcvAction:consultarTasasBcv "+ resp.getMensaje());
                 // enviar correo a la gerencia de intranet
@@ -39,7 +45,9 @@ public class BcvAction {
         }catch (Exception e){
             log.error("BcvAction:consultarTasasBcv");
             log.error(e.getMessage());
+            resp.setEstatus(Constantes.fail);
+            resp.setMensaje(e.getMessage());
         }
-
+        return resp;
     }
 }

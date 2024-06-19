@@ -13,47 +13,72 @@
     <!--     PARA USAR LOCAL EN EL BANCO -->
 
 
-       <bean id="dataSourceCarnet"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-          <property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver"/>
-            <property name="url" value="jdbc:jtds:sqlserver://180.183.112.19/PCSC_DB;user=saquantum;password=quantum"/>
-       </bean>
+<!--       <bean id="dataSourceCarnet"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--          <property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver"/>-->
+<!--            <property name="url" value="jdbc:jtds:sqlserver://180.183.201.157/PCSC_DB;user=saquantum;password=quantum"/>-->
+<!--       </bean>-->
 
-        <bean id="dataSourceAst"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-            <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
-            <property name="url" value="jdbc:oracle:thin:ASISTENCIA/ASISTENCIA@180.183.112.78:1560:INTRNETD"/>
-        </bean>
+<!--        <bean id="dataSourceAst"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--            <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>-->
+<!--            <property name="url" value="jdbc:oracle:thin:ASISTENCIA/ASISTENCIA@180.183.112.78:1560:INTRNETD"/>-->
+<!--        </bean>-->
 
 
 
-        <bean id="dataSourceVAC" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-            <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
-            <property name="url" value="jdbc:oracle:thin:VAC/VAC@180.183.112.78:1560:INTRNETD"/>
-        </bean>
+<!--        <bean id="dataSourceVAC" class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--            <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>-->
+<!--            <property name="url" value="jdbc:oracle:thin:VAC/VAC@180.183.112.78:1560:INTRNETD"/>-->
+<!--        </bean>-->
 
-        <bean id="dataSourceIntranetCorp"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-            <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
-            <property name="url" value="jdbc:oracle:thin:USU_INTRANETCORP/USU_INTRANETCORP@180.183.112.78:1560:INTRNETD"/>
-        </bean>
+<!--        <bean id="dataSourceIntranetCorp"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--            <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>-->
+<!--            <property name="url" value="jdbc:oracle:thin:USU_INTRANETCORP/USU_INTRANETCORP@180.183.112.78:1560:INTRNETD"/>-->
+<!--        </bean>-->
 
 
     <!-- WEBLOGIC CONEXION COMENTAR PARA TOMCAT -->
 
 
-<!--       <jee:jndi-lookup id="dataSourceCarnet"-->
-<!--                        jndi-name="jdbc/carnet"-->
-<!--                        expected-type="javax.sql.DataSource" />-->
+       <jee:jndi-lookup id="dataSourceCarnet"
+                        jndi-name="jdbc/carnet"
+                        expected-type="javax.sql.DataSource" />
 
-<!--       <jee:jndi-lookup id="dataSourceAst"-->
-<!--                        jndi-name="jdbc/asistencia"-->
-<!--                        expected-type="javax.sql.DataSource" />-->
+       <jee:jndi-lookup id="dataSourceAst"
+                        jndi-name="jdbc/asistencia"
+                        expected-type="javax.sql.DataSource" />
 
-<!--    <jee:jndi-lookup id="dataSourceIntranetCorp"-->
-<!--                             jndi-name="jdbc/intranetcorp"-->
-<!--                             expected-type="javax.sql.DataSource" />-->
+    <jee:jndi-lookup id="dataSourceIntranetCorp"
+                             jndi-name="jdbc/intranetcorp"
+                             expected-type="javax.sql.DataSource" />
 
-<!--    <jee:jndi-lookup id="dataSourceVAC"-->
-<!--                     jndi-name="jdbc/vac"-->
-<!--                     expected-type="javax.sql.DataSource" />-->
+    <jee:jndi-lookup id="dataSourceVAC"
+                     jndi-name="jdbc/vac"
+                     expected-type="javax.sql.DataSource" />
+
+
+
+
+<!--    <bean id="dataSourceCarnet"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--        <property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver"/>-->
+<!--        <property name="url" value="jdbc:jtds:sqlserver://180.183.201.157/PCSC_DB;user=saquantum;password=quantum"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="dataSourceAst"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>-->
+<!--        <property name="url" value="jdbc:oracle:thin:ASISTENCIA/Tq85Y6$5@sun001scan.banvenez.corp:1521/INTRNET.BANVENEZ.CORP"/>-->
+<!--    </bean>-->
+
+
+
+<!--    <bean id="dataSourceVAC" class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>-->
+<!--        <property name="url" value="jdbc:oracle:thin:VAC/zbgrttq7akys@sun001scan.banvenez.corp:1521/INTRNET.BANVENEZ.CORP"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="dataSourceIntranetCorp"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>-->
+<!--        <property name="url" value="jdbc:oracle:thin:USU_INTRANETCORP/Bdv_01$#2020@sun001scan.banvenez.corp:1521/INTRNET.BANVENEZ.CORP"/>-->
+<!--    </bean>-->
 
 
        <bean id="jdbctemplateCarnet" class="org.springframework.jdbc.core.JdbcTemplate">
