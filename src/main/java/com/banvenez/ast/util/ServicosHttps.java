@@ -1,13 +1,9 @@
 package com.banvenez.ast.util;
 
-
-
 import com.banvenez.ast.dto.Bcv.MonedaDTO;
 import com.banvenez.ast.dto.Intranet.CorreoDto;
 import com.banvenez.ast.dto.Intranet.RespuestaDto;
 import lombok.extern.slf4j.Slf4j;
-
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -32,14 +28,11 @@ import reactor.core.publisher.Mono;
 
 import javax.net.ssl.SSLContext;
 
-
-
 @Slf4j
 @Service
 public class ServicosHttps {
 
-    @Autowired
-    ConexionesServicios servicios;
+
 
     public MonedaDTO servicioBcv()   {
         CorreoDto correo =  new CorreoDto();
@@ -92,7 +85,7 @@ public class ServicosHttps {
             Elements xmlRetorno = extractXmlElement(entity, "MONEDA");
             MonedaDTO moneda = new MonedaDTO();
             for (Element elemen : xmlRetorno ){
-              //  if(elemen.attributes.get("CODIGO").getValue().equalsIgnoreCase("USD")){
+                //  if(elemen.attributes.get("CODIGO").getValue().equalsIgnoreCase("USD")){
 
                 if(elemen.attributes().get("CODIGO").equalsIgnoreCase("USD")){
                     moneda.setCodigo(elemen.attributes().get("CODIGO"));
@@ -118,22 +111,8 @@ public class ServicosHttps {
 
 
 
-    public void enviarCorreos(CorreoDto correo){
-        try {
-            RespuestaDto respCorreo = servicios.servicioIntranet().post()
-                    .uri("/envioCorreo")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(correo), CorreoDto.class)
-                    .exchange()
-                    .block()
-                    .bodyToMono(RespuestaDto.class)
-                    .doOnError(e -> log.error("Error enviarCorreos => ", e))
-                    .block();
-            log.info(respCorreo.getStatus());
-        }catch (Exception e){
-            log.error("SincronizarDataService:enviarCorreos mensaje=> ");
-            log.error(e.getMessage());
-        }
-    }
+
 
 }
+
+
