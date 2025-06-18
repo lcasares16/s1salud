@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 
-public class MedicoDto {
+public class MedicoDto  {
     private String codigo;
     private String nombre;
 

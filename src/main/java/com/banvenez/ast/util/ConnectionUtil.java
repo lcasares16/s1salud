@@ -9,12 +9,11 @@ import com.banvenez.ast.dto.Cobertura.PlanesSalidaDto;
 import com.banvenez.ast.dto.Cobertura.SumaAsegSalidaDto;
 import com.banvenez.ast.dto.Contratos.*;
 import com.banvenez.ast.dto.Contratos.reportes.ConsultaRepContratoDto;
-import com.banvenez.ast.dto.Contratos.reportes.EntradaRepContratoDto;
-import com.banvenez.ast.dto.Sorteo.SalidaJsonDscDto;
 import com.banvenez.ast.dto.Suscripcion.*;
 import com.banvenez.ast.dto.Suscripcion.reportes.ConsultaRepReciboDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
 import com.banvenez.ast.dto.administracion.*;
+import com.banvenez.ast.dto.citas.*;
 import com.banvenez.ast.dto.reclamo.*;
 import com.banvenez.ast.dto.reportes.RepContratoDto;
 import com.banvenez.ast.dto.reportes.RepReclamoDto;
@@ -23,9 +22,7 @@ import com.banvenez.ast.dto.reportes.SalidaRepDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -7523,6 +7520,1123 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         }
 
         return resp;
+    }
+// --- Métodos para Especialidades ---
+
+    public Integer crearEspecialidad(EspecialidadDto especialidad) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Integer nuevaEspecialidadId = null;
+        CallableStatement stmt = null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.crear_especialidad(?, ?)}");
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.setString(2, especialidad.getNombre());
+            stmt.setString(3, especialidad.getDescripcion());
+
+            stmt.execute();
+            nuevaEspecialidadId = stmt.getInt(1);
+            if (stmt.wasNull()) { // Check if the returned ID was NULL (e.g., on unique violation)
+                nuevaEspecialidadId = null;
+            }
+
+            conn.commit();
+            System.out.println("crearEspecialidad: Executed successfully. ID: " + nuevaEspecialidadId);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en crearEspecialidad: " + se.getMessage());
+            se.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e) {
+                    System.err.println("Error haciendo rollback en crearEspecialidad: " + e.getMessage());
+                }
+            }
+            // Consider throwing a custom exception or returning a specific error indicator
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en crearEspecialidad. " + cnfe.getMessage());
+            cnfe.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Error inesperado en crearEspecialidad: " + e.getMessage());
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.err.println("Error haciendo rollback en crearEspecialidad: " + ex.getMessage());
+                }
+            }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en crearEspecialidad: " + e.getMessage());
+            }
+        }
+        return nuevaEspecialidadId;
+    }
+
+    public List<EspecialidadDto> obtenerEspecialidades() {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<EspecialidadDto> especialidades = new ArrayList<>();
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            // No setAutoCommit(false) needed for read-only operations if SP doesn't require it
+
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_especialidades()}");
+            stmt.registerOutParameter(1, Types.OTHER); // For cursor
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            while (rs.next()) {
+                EspecialidadDto especialidad = new EspecialidadDto();
+                especialidad.setEspecialidadId(rs.getInt("especialidad_id"));
+                especialidad.setNombre(rs.getString("nombre"));
+                especialidad.setDescripcion(rs.getString("descripcion"));
+                especialidades.add(especialidad);
+            }
+            System.out.println("obtenerEspecialidades: Fetched " + especialidades.size() + " records.");
+        } catch (SQLException se) {
+            System.err.println("Error SQL en obtenerEspecialidades: " + se.getMessage());
+            se.printStackTrace();
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en obtenerEspecialidades. " + cnfe.getMessage());
+            cnfe.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Error inesperado en obtenerEspecialidades: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerEspecialidades: " + e.getMessage());
+            }
+        }
+        return especialidades;
+    }
+
+    public EspecialidadDto obtenerEspecialidadPorId(Integer especialidadId) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        EspecialidadDto especialidad = null;
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        if (especialidadId == null) return null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_especialidad_por_id(?)}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, especialidadId);
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            if (rs.next()) {
+                especialidad = new EspecialidadDto();
+                especialidad.setEspecialidadId(rs.getInt("especialidad_id"));
+                especialidad.setNombre(rs.getString("nombre"));
+                especialidad.setDescripcion(rs.getString("descripcion"));
+                System.out.println("obtenerEspecialidadPorId: Found especialidad with ID " + especialidadId);
+            } else {
+                System.out.println("obtenerEspecialidadPorId: No especialidad found with ID " + especialidadId);
+            }
+        } catch (SQLException se) {
+            System.err.println("Error SQL en obtenerEspecialidadPorId: " + se.getMessage());
+            se.printStackTrace();
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en obtenerEspecialidadPorId. " + cnfe.getMessage());
+            cnfe.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Error inesperado en obtenerEspecialidadPorId: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerEspecialidadPorId: " + e.getMessage());
+            }
+        }
+        return especialidad;
+    }
+
+    public String actualizarEspecialidad(EspecialidadDto especialidad) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        String resultado = "ERROR: Unknown";
+        CallableStatement stmt = null;
+
+        if (especialidad == null || especialidad.getEspecialidadId() == null) {
+            return "ERROR: Especialidad o ID nulo.";
+        }
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.actualizar_especialidad(?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.VARCHAR);
+            stmt.setInt(2, especialidad.getEspecialidadId());
+            stmt.setString(3, especialidad.getNombre());
+            stmt.setString(4, especialidad.getDescripcion());
+
+            stmt.execute();
+            resultado = stmt.getString(1);
+            conn.commit();
+            System.out.println("actualizarEspecialidad: Result for ID " + especialidad.getEspecialidadId() + ": " + resultado);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en actualizarEspecialidad: " + se.getMessage());
+            se.printStackTrace();
+            resultado = "ERROR: " + se.getMessage();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e) {
+                    System.err.println("Error haciendo rollback en actualizarEspecialidad: " + e.getMessage());
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en actualizarEspecialidad. " + cnfe.getMessage());
+            cnfe.printStackTrace();
+            resultado = "ERROR: Driver no encontrado.";
+        } catch (Exception e) {
+            System.err.println("Error inesperado en actualizarEspecialidad: " + e.getMessage());
+            e.printStackTrace();
+            resultado = "ERROR: " + e.getMessage();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.err.println("Error haciendo rollback en actualizarEspecialidad: " + ex.getMessage());
+                }
+            }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en actualizarEspecialidad: " + e.getMessage());
+            }
+        }
+        return resultado;
+    }
+
+    public String eliminarEspecialidad(Integer especialidadId) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        String resultado = "ERROR: Unknown";
+        CallableStatement stmt = null;
+
+        if (especialidadId == null) {
+            return "ERROR: ID de especialidad nulo.";
+        }
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.eliminar_especialidad(?)}");
+            stmt.registerOutParameter(1, Types.VARCHAR);
+            stmt.setInt(2, especialidadId);
+
+            stmt.execute();
+            resultado = stmt.getString(1);
+            conn.commit();
+            System.out.println("eliminarEspecialidad: Result for ID " + especialidadId + ": " + resultado);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en eliminarEspecialidad: " + se.getMessage());
+            se.printStackTrace();
+            resultado = "ERROR: " + se.getMessage(); // Could be FK violation if medicos reference it
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e) {
+                    System.err.println("Error haciendo rollback en eliminarEspecialidad: " + e.getMessage());
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en eliminarEspecialidad. " + cnfe.getMessage());
+            cnfe.printStackTrace();
+            resultado = "ERROR: Driver no encontrado.";
+        } catch (Exception e) {
+            System.err.println("Error inesperado en eliminarEspecialidad: " + e.getMessage());
+            e.printStackTrace();
+            resultado = "ERROR: " + e.getMessage();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.err.println("Error haciendo rollback en eliminarEspecialidad: " + ex.getMessage());
+                }
+            }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en eliminarEspecialidad: " + e.getMessage());
+            }
+        }
+        return resultado;
+    }
+
+    // --- Métodos para Pacientes ---
+
+    public Integer crearPaciente(PacienteDto paciente) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Integer nuevoPacienteId = null;
+        CallableStatement stmt = null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.crear_paciente(?, ?, ?, ?, ?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.setString(2, paciente.getCedula());
+            stmt.setString(3, paciente.getNombre());
+            stmt.setString(4, paciente.getApellido());
+            if (paciente.getFechaNacimiento() != null) {
+                stmt.setDate(5, new java.sql.Date(paciente.getFechaNacimiento().getTime()));
+            } else {
+                stmt.setNull(5, Types.DATE);
+            }
+            stmt.setString(6, paciente.getTelefono());
+            stmt.setString(7, paciente.getCorreoElectronico());
+            stmt.setString(8, paciente.getDireccion());
+
+            stmt.execute();
+            nuevoPacienteId = stmt.getInt(1);
+            if (stmt.wasNull()) {
+                nuevoPacienteId = null;
+            }
+            conn.commit();
+            System.out.println("crearPaciente: Executed successfully. ID: " + nuevoPacienteId);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en crearPaciente: " + se.getMessage());
+            se.printStackTrace();
+            if (conn != null) try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en crearPaciente. " + cnfe.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error inesperado en crearPaciente: " + e.getMessage());
+            e.printStackTrace();
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en crearPaciente: " + e.getMessage());
+            }
+        }
+        return nuevoPacienteId;
+    }
+
+    public List<PacienteDto> obtenerPacientes() {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<PacienteDto> pacientes = new ArrayList<>();
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_pacientes()}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            while (rs.next()) {
+                PacienteDto paciente = new PacienteDto();
+                paciente.setPacienteId(rs.getInt("paciente_id"));
+                paciente.setCedula(rs.getString("cedula"));
+                paciente.setNombre(rs.getString("nombre"));
+                paciente.setApellido(rs.getString("apellido"));
+                paciente.setFechaNacimiento(rs.getDate("fecha_nacimiento")); // Automatically java.sql.Date
+                paciente.setTelefono(rs.getString("telefono"));
+                paciente.setCorreoElectronico(rs.getString("correo_electronico"));
+                paciente.setDireccion(rs.getString("direccion"));
+                paciente.setFechaRegistro(rs.getTimestamp("fecha_registro")); // Automatically java.sql.Timestamp
+                pacientes.add(paciente);
+            }
+            System.out.println("obtenerPacientes: Fetched " + pacientes.size() + " records.");
+        } catch (Exception e) {
+            System.err.println("Error en obtenerPacientes: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerPacientes: " + e.getMessage());
+            }
+        }
+        return pacientes;
+    }
+
+    public PacienteDto obtenerPacientePorId(Integer pacienteId) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        PacienteDto paciente = null;
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        if (pacienteId == null) return null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_paciente_por_id(?)}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, pacienteId);
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            if (rs.next()) {
+                paciente = new PacienteDto();
+                paciente.setPacienteId(rs.getInt("paciente_id"));
+                paciente.setCedula(rs.getString("cedula"));
+                paciente.setNombre(rs.getString("nombre"));
+                paciente.setApellido(rs.getString("apellido"));
+                paciente.setFechaNacimiento(rs.getDate("fecha_nacimiento"));
+                paciente.setTelefono(rs.getString("telefono"));
+                paciente.setCorreoElectronico(rs.getString("correo_electronico"));
+                paciente.setDireccion(rs.getString("direccion"));
+                paciente.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                System.out.println("obtenerPacientePorId: Found paciente with ID " + pacienteId);
+            } else {
+                System.out.println("obtenerPacientePorId: No paciente found with ID " + pacienteId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error en obtenerPacientePorId: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerPacientePorId: " + e.getMessage());
+            }
+        }
+        return paciente;
+    }
+
+    public PacienteDto obtenerPacientePorCedula(String cedula) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        PacienteDto paciente = null;
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        if (cedula == null || cedula.trim().isEmpty()) return null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_paciente_por_cedula(?)}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setString(2, cedula);
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            if (rs.next()) {
+                paciente = new PacienteDto();
+                paciente.setPacienteId(rs.getInt("paciente_id"));
+                paciente.setCedula(rs.getString("cedula"));
+                paciente.setNombre(rs.getString("nombre"));
+                paciente.setApellido(rs.getString("apellido"));
+                paciente.setFechaNacimiento(rs.getDate("fecha_nacimiento"));
+                paciente.setTelefono(rs.getString("telefono"));
+                paciente.setCorreoElectronico(rs.getString("correo_electronico"));
+                paciente.setDireccion(rs.getString("direccion"));
+                paciente.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                System.out.println("obtenerPacientePorCedula: Found paciente with cedula " + cedula);
+            } else {
+                System.out.println("obtenerPacientePorCedula: No paciente found with cedula " + cedula);
+            }
+        } catch (Exception e) {
+            System.err.println("Error en obtenerPacientePorCedula: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerPacientePorCedula: " + e.getMessage());
+            }
+        }
+        return paciente;
+    }
+
+    public String actualizarPaciente(PacienteDto paciente) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        String resultado = "ERROR: Unknown";
+        CallableStatement stmt = null;
+
+        if (paciente == null || paciente.getPacienteId() == null) {
+            return "ERROR: Paciente o ID nulo.";
+        }
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.actualizar_paciente(?, ?, ?, ?, ?, ?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.VARCHAR);
+            stmt.setInt(2, paciente.getPacienteId());
+            stmt.setString(3, paciente.getCedula());
+            stmt.setString(4, paciente.getNombre());
+            stmt.setString(5, paciente.getApellido());
+            if (paciente.getFechaNacimiento() != null) {
+                stmt.setDate(6, new java.sql.Date(paciente.getFechaNacimiento().getTime()));
+            } else {
+                stmt.setNull(6, Types.DATE);
+            }
+            stmt.setString(7, paciente.getTelefono());
+            stmt.setString(8, paciente.getCorreoElectronico());
+            stmt.setString(9, paciente.getDireccion());
+
+            stmt.execute();
+            resultado = stmt.getString(1);
+            conn.commit();
+            System.out.println("actualizarPaciente: Result for ID " + paciente.getPacienteId() + ": " + resultado);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en actualizarPaciente: " + se.getMessage());
+            se.printStackTrace();
+            resultado = "ERROR: " + se.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en actualizarPaciente. " + cnfe.getMessage());
+            resultado = "ERROR: Driver no encontrado.";
+        } catch (Exception e) {
+            System.err.println("Error inesperado en actualizarPaciente: " + e.getMessage());
+            e.printStackTrace();
+            resultado = "ERROR: " + e.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en actualizarPaciente: " + e.getMessage());
+            }
+        }
+        return resultado;
+    }
+
+    public String eliminarPaciente(Integer pacienteId) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        String resultado = "ERROR: Unknown";
+        CallableStatement stmt = null;
+
+        if (pacienteId == null) {
+            return "ERROR: ID de paciente nulo.";
+        }
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.eliminar_paciente(?)}");
+            stmt.registerOutParameter(1, Types.VARCHAR);
+            stmt.setInt(2, pacienteId);
+
+            stmt.execute();
+            resultado = stmt.getString(1);
+            conn.commit();
+            System.out.println("eliminarPaciente: Result for ID " + pacienteId + ": " + resultado);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en eliminarPaciente: " + se.getMessage());
+            se.printStackTrace();
+            resultado = "ERROR: " + se.getMessage(); // FK violation if citas exist and ON DELETE is RESTRICT
+            if (conn != null) try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en eliminarPaciente. " + cnfe.getMessage());
+            resultado = "ERROR: Driver no encontrado.";
+        } catch (Exception e) {
+            System.err.println("Error inesperado en eliminarPaciente: " + e.getMessage());
+            e.printStackTrace();
+            resultado = "ERROR: " + e.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en eliminarPaciente: " + e.getMessage());
+            }
+        }
+        return resultado;
+    }
+
+    // --- Métodos para Médicos ---
+
+    public Integer crearMedico(MedicosDto medico) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Integer nuevoMedicoId = null;
+        CallableStatement stmt = null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.crear_medico(?, ?, ?, ?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.setString(2, medico.getCedula());
+            stmt.setString(3, medico.getNombre());
+            stmt.setString(4, medico.getApellido());
+            if (medico.getEspecialidadId() != null) {
+                stmt.setInt(5, medico.getEspecialidadId());
+            } else {
+                stmt.setNull(5, Types.INTEGER);
+            }
+            stmt.setString(6, medico.getTelefono());
+            stmt.setString(7, medico.getCorreoElectronico());
+
+            stmt.execute();
+            nuevoMedicoId = stmt.getInt(1);
+            if (stmt.wasNull()) {
+                nuevoMedicoId = null;
+            }
+            conn.commit();
+            System.out.println("crearMedico: Executed successfully. ID: " + nuevoMedicoId);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en crearMedico: " + se.getMessage() + " SQLState: " + se.getSQLState());
+            se.printStackTrace();
+            if (conn != null) try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en crearMedico. " + cnfe.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error inesperado en crearMedico: " + e.getMessage());
+            e.printStackTrace();
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en crearMedico: " + e.getMessage());
+            }
+        }
+        return nuevoMedicoId;
+    }
+
+    public List<MedicosDto> obtenerMedicos() {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<MedicosDto> medicos = new ArrayList<>();
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos()}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            while (rs.next()) {
+                MedicosDto medico = new MedicosDto();
+                medico.setMedicoId(rs.getInt("medico_id"));
+                medico.setCedula(rs.getString("cedula"));
+                medico.setNombre(rs.getString("nombre"));
+                medico.setApellido(rs.getString("apellido"));
+                medico.setEspecialidadId(rs.getInt("especialidad_id"));
+                if (rs.wasNull()) { // Handle null especialidad_id
+                    medico.setEspecialidadId(null);
+                }
+                medico.setTelefono(rs.getString("telefono"));
+                medico.setCorreoElectronico(rs.getString("correo_electronico"));
+                medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
+                medicos.add(medico);
+            }
+            System.out.println("obtenerMedicos: Fetched " + medicos.size() + " records.");
+        } catch (Exception e) {
+            System.err.println("Error en obtenerMedicos: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerMedicos: " + e.getMessage());
+            }
+        }
+        return medicos;
+    }
+
+    public MedicosDto obtenerMedicoPorId(Integer medicoId) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        MedicosDto medico = null;
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        if (medicoId == null) return null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_medico_por_id(?)}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, medicoId);
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            if (rs.next()) {
+                medico = new MedicosDto();
+                medico.setMedicoId(rs.getInt("medico_id"));
+                medico.setCedula(rs.getString("cedula"));
+                medico.setNombre(rs.getString("nombre"));
+                medico.setApellido(rs.getString("apellido"));
+                medico.setEspecialidadId(rs.getInt("especialidad_id"));
+                if (rs.wasNull()) {
+                    medico.setEspecialidadId(null);
+                }
+                medico.setTelefono(rs.getString("telefono"));
+                medico.setCorreoElectronico(rs.getString("correo_electronico"));
+                medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
+                System.out.println("obtenerMedicoPorId: Found medico with ID " + medicoId);
+            } else {
+                System.out.println("obtenerMedicoPorId: No medico found with ID " + medicoId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error en obtenerMedicoPorId: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerMedicoPorId: " + e.getMessage());
+            }
+        }
+        return medico;
+    }
+
+    public List<MedicosDto> obtenerMedicosPorEspecialidad(Integer especialidadId) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<MedicosDto> medicos = new ArrayList<>();
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        if (especialidadId == null) return medicos; // Return empty list
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos_por_especialidad(?)}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, especialidadId);
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            while (rs.next()) {
+                MedicosDto medico = new MedicosDto();
+                medico.setMedicoId(rs.getInt("medico_id"));
+                medico.setCedula(rs.getString("cedula"));
+                medico.setNombre(rs.getString("nombre"));
+                medico.setApellido(rs.getString("apellido"));
+                medico.setEspecialidadId(rs.getInt("especialidad_id"));
+                if (rs.wasNull()) {
+                    medico.setEspecialidadId(null);
+                }
+                medico.setTelefono(rs.getString("telefono"));
+                medico.setCorreoElectronico(rs.getString("correo_electronico"));
+                medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
+                medicos.add(medico);
+            }
+            System.out.println("obtenerMedicosPorEspecialidad: Fetched " + medicos.size() + " records for especialidad ID " + especialidadId);
+        } catch (Exception e) {
+            System.err.println("Error en obtenerMedicosPorEspecialidad: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerMedicosPorEspecialidad: " + e.getMessage());
+            }
+        }
+        return medicos;
+    }
+
+    public String actualizarMedico(MedicosDto medico) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        String resultado = "ERROR: Unknown";
+        CallableStatement stmt = null;
+
+        if (medico == null || medico.getMedicoId() == null) {
+            return "ERROR: Medico o ID nulo.";
+        }
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.actualizar_medico(?, ?, ?, ?, ?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.VARCHAR);
+            stmt.setInt(2, medico.getMedicoId());
+            stmt.setString(3, medico.getCedula());
+            stmt.setString(4, medico.getNombre());
+            stmt.setString(5, medico.getApellido());
+            if (medico.getEspecialidadId() != null) {
+                stmt.setInt(6, medico.getEspecialidadId());
+            } else {
+                stmt.setNull(6, Types.INTEGER);
+            }
+            stmt.setString(7, medico.getTelefono());
+            stmt.setString(8, medico.getCorreoElectronico());
+
+            stmt.execute();
+            resultado = stmt.getString(1);
+            conn.commit();
+            System.out.println("actualizarMedico: Result for ID " + medico.getMedicoId() + ": " + resultado);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en actualizarMedico: " + se.getMessage());
+            se.printStackTrace();
+            resultado = "ERROR: " + se.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en actualizarMedico. " + cnfe.getMessage());
+            resultado = "ERROR: Driver no encontrado.";
+        } catch (Exception e) {
+            System.err.println("Error inesperado en actualizarMedico: " + e.getMessage());
+            e.printStackTrace();
+            resultado = "ERROR: " + e.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en actualizarMedico: " + e.getMessage());
+            }
+        }
+        return resultado;
+    }
+
+    // --- Métodos para Citas ---
+
+    public Integer crearCita(CrearCitaRequestDto citaRequest) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Integer nuevaCitaId = null;
+        CallableStatement stmt = null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.crear_cita(?, ?, ?, ?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.setInt(2, citaRequest.getPacienteId());
+            stmt.setInt(3, citaRequest.getMedicoId());
+            stmt.setTimestamp(4, new java.sql.Timestamp(citaRequest.getFechaHora().getTime()));
+            stmt.setString(5, citaRequest.getMotivo());
+            stmt.setString(6, citaRequest.getNotasPaciente());
+            stmt.setString(7, "Programada"); // Default estado as per SP definition
+
+            stmt.execute();
+            nuevaCitaId = stmt.getInt(1);
+            if (stmt.wasNull()) {
+                nuevaCitaId = null;
+            }
+            conn.commit();
+            System.out.println("crearCita: Executed successfully. ID: " + nuevaCitaId);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en crearCita: " + se.getMessage() + " SQLState: " + se.getSQLState());
+            se.printStackTrace();
+            if (conn != null) try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en crearCita. " + cnfe.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error inesperado en crearCita: " + e.getMessage());
+            e.printStackTrace();
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en crearCita: " + e.getMessage());
+            }
+        }
+        return nuevaCitaId;
+    }
+
+    private CitaDto mapResultSetToCitaDto(ResultSet rs) throws SQLException {
+        CitaDto cita = new CitaDto();
+        cita.setCitaId(rs.getInt("cita_id"));
+        cita.setPacienteId(rs.getInt("paciente_id"));
+        cita.setMedicoId(rs.getInt("medico_id"));
+        cita.setFechaHora(rs.getTimestamp("fecha_hora"));
+        cita.setMotivo(rs.getString("motivo"));
+        cita.setEstado(rs.getString("estado"));
+        cita.setNotasMedico(rs.getString("notas_medico"));
+        cita.setNotasPaciente(rs.getString("notas_paciente"));
+        cita.setFechaCreacion(rs.getTimestamp("fecha_creacion"));
+        cita.setFechaActualizacion(rs.getTimestamp("fecha_actualizacion"));
+        // pacienteNombreCompleto, medicoNombreCompleto, medicoEspecialidad are not set here
+        return cita;
+    }
+
+    public CitaDto obtenerCitaPorId(Integer citaId) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        CitaDto cita = null;
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        if (citaId == null) return null;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_cita_por_id(?)}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, citaId);
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            if (rs.next()) {
+                cita = mapResultSetToCitaDto(rs);
+                System.out.println("obtenerCitaPorId: Found cita with ID " + citaId);
+            } else {
+                System.out.println("obtenerCitaPorId: No cita found with ID " + citaId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error en obtenerCitaPorId: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerCitaPorId: " + e.getMessage());
+            }
+        }
+        return cita;
+    }
+
+    public List<CitaDto> obtenerCitasPorPaciente(Integer pacienteId, java.util.Date fechaDesde, java.util.Date fechaHasta) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<CitaDto> citas = new ArrayList<>();
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        if (pacienteId == null) return citas;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_citas_por_paciente(?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, pacienteId);
+            stmt.setTimestamp(3, fechaDesde == null ? null : new java.sql.Timestamp(fechaDesde.getTime()));
+            stmt.setTimestamp(4, fechaHasta == null ? null : new java.sql.Timestamp(fechaHasta.getTime()));
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            while (rs.next()) {
+                citas.add(mapResultSetToCitaDto(rs));
+            }
+            System.out.println("obtenerCitasPorPaciente: Fetched " + citas.size() + " records for paciente ID " + pacienteId);
+        } catch (Exception e) {
+            System.err.println("Error en obtenerCitasPorPaciente: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerCitasPorPaciente: " + e.getMessage());
+            }
+        }
+        return citas;
+    }
+
+    public List<CitaDto> obtenerCitasPorMedico(Integer medicoId, java.util.Date fechaDesde, java.util.Date fechaHasta) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<CitaDto> citas = new ArrayList<>();
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        if (medicoId == null) return citas;
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            stmt = conn.prepareCall("{? = call citas_medicas.obtener_citas_por_medico(?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, medicoId);
+            stmt.setTimestamp(3, fechaDesde == null ? null : new java.sql.Timestamp(fechaDesde.getTime()));
+            stmt.setTimestamp(4, fechaHasta == null ? null : new java.sql.Timestamp(fechaHasta.getTime()));
+            stmt.execute();
+            rs = (ResultSet) stmt.getObject(1);
+
+            while (rs.next()) {
+                citas.add(mapResultSetToCitaDto(rs));
+            }
+            System.out.println("obtenerCitasPorMedico: Fetched " + citas.size() + " records for medico ID " + medicoId);
+        } catch (Exception e) {
+            System.err.println("Error en obtenerCitasPorMedico: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en obtenerCitasPorMedico: " + e.getMessage());
+            }
+        }
+        return citas;
+    }
+
+    public String actualizarEstadoCita(Integer citaId, String nuevoEstado, String notasMedico) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        String resultado = "ERROR: Unknown";
+        CallableStatement stmt = null;
+
+        if (citaId == null || nuevoEstado == null || nuevoEstado.trim().isEmpty()) {
+            return "ERROR: Cita ID o nuevo estado nulo/vacío.";
+        }
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.actualizar_estado_cita(?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.VARCHAR);
+            stmt.setInt(2, citaId);
+            stmt.setString(3, nuevoEstado);
+            stmt.setString(4, notasMedico); // Can be null
+
+            stmt.execute();
+            resultado = stmt.getString(1);
+            conn.commit();
+            System.out.println("actualizarEstadoCita: Result for ID " + citaId + ": " + resultado);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en actualizarEstadoCita: " + se.getMessage());
+            se.printStackTrace();
+            resultado = "ERROR: " + se.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en actualizarEstadoCita. " + cnfe.getMessage());
+            resultado = "ERROR: Driver no encontrado.";
+        } catch (Exception e) {
+            System.err.println("Error inesperado en actualizarEstadoCita: " + e.getMessage());
+            e.printStackTrace();
+            resultado = "ERROR: " + e.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en actualizarEstadoCita: " + e.getMessage());
+            }
+        }
+        return resultado;
+    }
+
+    public String reprogramarCita(Integer citaId, java.util.Date nuevaFechaHora, String notasPaciente) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        String resultado = "ERROR: Unknown";
+        CallableStatement stmt = null;
+
+        if (citaId == null || nuevaFechaHora == null) {
+            return "ERROR: Cita ID o nueva fecha/hora nula.";
+        }
+
+        try {
+            Class.forName(conexion.getDrivers());
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+
+            stmt = conn.prepareCall("{? = call citas_medicas.reprogramar_cita(?, ?, ?)}");
+            stmt.registerOutParameter(1, Types.VARCHAR);
+            stmt.setInt(2, citaId);
+            stmt.setTimestamp(3, new java.sql.Timestamp(nuevaFechaHora.getTime()));
+            stmt.setString(4, notasPaciente); // Can be null
+
+            stmt.execute();
+            resultado = stmt.getString(1);
+            conn.commit();
+            System.out.println("reprogramarCita: Result for ID " + citaId + ": " + resultado);
+        } catch (SQLException se) {
+            System.err.println("Error SQL en reprogramarCita: " + se.getMessage());
+            se.printStackTrace();
+            resultado = "ERROR: " + se.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Error: Driver no encontrado en reprogramarCita. " + cnfe.getMessage());
+            resultado = "ERROR: Driver no encontrado.";
+        } catch (Exception e) {
+            System.err.println("Error inesperado en reprogramarCita: " + e.getMessage());
+            e.printStackTrace();
+            resultado = "ERROR: " + e.getMessage();
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error cerrando recursos en reprogramarCita: " + e.getMessage());
+            }
+        }
+        return resultado;
     }
 
 
