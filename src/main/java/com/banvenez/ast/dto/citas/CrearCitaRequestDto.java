@@ -11,10 +11,18 @@ import java.util.Date;
 
 
 public class CrearCitaRequestDto {
+
+    private Integer citaId;
     private Integer pacienteId;
     private Integer medicoId;
     private Date    fechaHora;
     private String  motivo;
+    private String  estado;
+    private String  notasMedico;
     private String  notasPaciente;
-
+    private Date    fechaCreacion;
+    private Date    fechaActualizacion;
+    private String  numerocontrato;
+    private Integer codigosuscripcion;
+    private Integer cedula;
 }
