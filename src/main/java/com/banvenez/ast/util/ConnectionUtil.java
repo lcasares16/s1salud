@@ -8171,6 +8171,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                     sol.setNombre(rs.getString("nombre"));
                     sol.setApellido(rs.getString("apellido"));
                     sol.setEspecialidadId(rs.getInt("especialidad_id"));
+                    sol.setNombreEspecialidad(rs.getString("nombreEspecialidad"));
                     sol.setTelefono(rs.getString("telefono"));
                     sol.setCorreoElectronico(rs.getString("correo_electronico"));
                     sol.setFechaRegistro(rs.getTimestamp("fecha_registro"));
