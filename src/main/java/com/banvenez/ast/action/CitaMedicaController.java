@@ -1,11 +1,5 @@
 package com.banvenez.ast.action;
-import com.banvenez.ast.dto.Suscripcion.CargaMasivaDto;
-import com.banvenez.ast.dto.Suscripcion.CargaPrincipalDto;
-import com.banvenez.ast.dto.administracion.RetornoCobraCuotasDto;
 import com.banvenez.ast.dto.citas.*;
-import com.banvenez.ast.dto.farmacia.DetFacturaDto;
-import com.banvenez.ast.dto.farmacia.RegistrarInventarioDto;
-import com.banvenez.ast.dto.farmacia.Resultado;
 import com.banvenez.ast.util.ConnectionUtil;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -13,14 +7,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Date;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/S1Salud/citas-medicas")
 @CrossOrigin
 public class CitaMedicaController {
 
-@PostMapping("/especialidades")
+    @PostMapping("/especialidades")
     public ResponseEntity<?> crearEspecialidad(@RequestBody EspecialidadDto especialidadDto) {
         if (especialidadDto == null || especialidadDto.getNombre() == null || especialidadDto.getNombre().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El nombre de la especialidad es obligatorio.");
@@ -43,45 +40,40 @@ public class CitaMedicaController {
         }
     }
 
-    @PostMapping("/consulta-especialidades")
+    @GetMapping("/especialidades")
     public ResponseEntity<List<EspecialidadDto>> obtenerEspecialidades() {
         ConnectionUtil db = new ConnectionUtil();
         List<EspecialidadDto> especialidades = db.obtenerEspecialidades();
         return ResponseEntity.ok(especialidades);
     }
 
-    @PostMapping("/consulta-especialidades-id")
-    public ResponseEntity<?> obtenerEspecialidadPorId(@RequestBody EspecialidadDto entrada){
-
-
-//    @GetMapping("/especialidades/{id}")
-//    public ResponseEntity<?> obtenerEspecialidadPorId(@PathVariable Integer id) {
-        if (entrada.getEspecialidadId()== null) {
+    @GetMapping("/especialidades/{id}")
+    public ResponseEntity<?> obtenerEspecialidadPorId(@PathVariable Integer id) {
+        if (id == null) {
             return ResponseEntity.badRequest().body("El ID de la especialidad no puede ser nulo.");
         }
         ConnectionUtil db = new ConnectionUtil();
-        EspecialidadDto especialidad = db.obtenerEspecialidadPorId(entrada.getEspecialidadId());
+        EspecialidadDto especialidad = db.obtenerEspecialidadPorId(id);
         if (especialidad != null) {
             return ResponseEntity.ok(especialidad);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Especialidad no encontrada con ID: " + entrada.getEspecialidadId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Especialidad no encontrada con ID: " + id);
         }
     }
 
-    @PostMapping("/actualiza-especialidades")
-    //public ResponseEntity<String> actualizarEspecialidad(@PathVariable Integer id, @RequestBody EspecialidadDto especialidadDto) {
-        public ResponseEntity<?> actualizarEspecialidad(@RequestBody EspecialidadDto entrada){
-        if (entrada.getEspecialidadId() == null || entrada == null) {
+    @PutMapping("/especialidades/{id}")
+    public ResponseEntity<String> actualizarEspecialidad(@PathVariable Integer id, @RequestBody EspecialidadDto especialidadDto) {
+        if (id == null || especialidadDto == null) {
             return ResponseEntity.badRequest().body("ID de especialidad y datos son obligatorios.");
         }
-        if (entrada.getNombre() == null || entrada.getNombre().trim().isEmpty()) {
+        if (especialidadDto.getNombre() == null || especialidadDto.getNombre().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El nombre de la especialidad es obligatorio.");
         }
 
         ConnectionUtil db = new ConnectionUtil();
         // Ensure the ID in the DTO matches the path variable for consistency
-        entrada.setEspecialidadId(entrada.getEspecialidadId());
-        String resultado = db.actualizarEspecialidad(entrada);
+        especialidadDto.setEspecialidadId(id);
+        String resultado = db.actualizarEspecialidad(especialidadDto);
 
         if ("SUCCESS".equals(resultado)) {
             return ResponseEntity.ok("Especialidad actualizada correctamente.");
@@ -94,15 +86,13 @@ public class CitaMedicaController {
         }
     }
 
-
-
-    @PostMapping("/eliminar-especialidades")
-    public ResponseEntity<String> eliminarEspecialidad(@RequestBody EspecialidadDto entrada) {
-        if (entrada.getEspecialidadId() == null) {
+    @DeleteMapping("/especialidades/{id}")
+    public ResponseEntity<String> eliminarEspecialidad(@PathVariable Integer id) {
+        if (id == null) {
             return ResponseEntity.badRequest().body("El ID de la especialidad no puede ser nulo.");
         }
         ConnectionUtil db = new ConnectionUtil();
-        String resultado = db.eliminarEspecialidad(entrada.getEspecialidadId());
+        String resultado = db.eliminarEspecialidad(id);
 
         if ("SUCCESS".equals(resultado)) {
             return ResponseEntity.ok("Especialidad eliminada correctamente.");
@@ -369,7 +359,7 @@ public class CitaMedicaController {
 
     // --- Endpoints para Citas ---
 
-    @PostMapping("/crea-citas")
+    @PostMapping("/citas")
     public ResponseEntity<?> crearCita(@RequestBody CrearCitaRequestDto citaRequestDto) {
         if (citaRequestDto == null || citaRequestDto.getPacienteId() == null ||
                 citaRequestDto.getMedicoId() == null || citaRequestDto.getFechaHora() == null) {
@@ -379,13 +369,13 @@ public class CitaMedicaController {
         ConnectionUtil db = new ConnectionUtil();
 
         // Validate Paciente existence
-        if (db.obtenerPacientePorId_new(citaRequestDto.getPacienteId()) == null) {
+        if (db.obtenerPacientePorId(citaRequestDto.getPacienteId()) == null) {
             return ResponseEntity.badRequest().body("Error: El paciente con ID " + citaRequestDto.getPacienteId() + " no existe.");
         }
         // Validate Medico existence
-//        if (db.obtenerMedicoPorId(citaRequestDto.getMedicoId()) == null) {
-//            return ResponseEntity.badRequest().body("Error: El médico con ID " + citaRequestDto.getMedicoId() + " no existe.");
-//        }
+        if (db.obtenerMedicoPorId(citaRequestDto.getMedicoId()) == null) {
+            return ResponseEntity.badRequest().body("Error: El médico con ID " + citaRequestDto.getMedicoId() + " no existe.");
+        }
 
         Integer nuevaCitaId = db.crearCita(citaRequestDto);
 
@@ -404,69 +394,57 @@ public class CitaMedicaController {
         }
     }
 
-
-
-/*    @PostMapping("/consulta-citas")
-    public ResponseEntity<?> obtenerCitaPorId(@RequestBody CitaDto entrada) {
-        if (entrada.getCitaId() == null) {
+    @GetMapping("/citas/{id}")
+    public ResponseEntity<?> obtenerCitaPorId(@PathVariable Integer id) {
+        if (id == null) {
             return ResponseEntity.badRequest().body("El ID de la cita no puede ser nulo.");
         }
         ConnectionUtil db = new ConnectionUtil();
-        CitaDto cita = db.obtenerCitaPorId_new(entrada.getCitaId());
+        CitaDto cita = db.obtenerCitaPorId(id);
         if (cita != null) {
             populateCitaDtoDetails(cita, db);
             return ResponseEntity.ok(cita);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cita no encontrada con ID: " + entrada.getCitaId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cita no encontrada con ID: " + id);
         }
-    }*/
-
-
-    @PostMapping("/consulta-citas")
-    public List<CitaDto> inventario(@RequestBody CitaDto entrada){
-
-        List<CitaDto> solicitudes = new ArrayList<CitaDto>();
-        ConnectionUtil db = new ConnectionUtil();
-        solicitudes = db.obtenerCitaPorId_new(entrada.getCitaId());
-
-
-        return solicitudes;
     }
 
-
-
-    @PostMapping("/citas-paciente")
+    @GetMapping("/citas/paciente/{pacienteId}")
     public ResponseEntity<?> obtenerCitasPorPaciente(
-            @RequestBody CitaDto entrada) {
-        if (entrada.getPacienteId() == null) {
+            @PathVariable Integer pacienteId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fechaDesde,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fechaHasta) {
+        if (pacienteId == null) {
             return ResponseEntity.badRequest().body("El ID del paciente no puede ser nulo.");
         }
         ConnectionUtil db = new ConnectionUtil();
-        List<CitaDto> citas = db.obtenerCitasPorPaciente(entrada.getPacienteId(), entrada.getFechadesde(), entrada.getFechahasta());
+        List<CitaDto> citas = db.obtenerCitasPorPaciente(pacienteId, fechaDesde, fechaHasta);
         for (CitaDto cita : citas) {
             populateCitaDtoDetails(cita, db);
         }
         return ResponseEntity.ok(citas);
     }
 
-    @PostMapping("/citas-medico")
+    @GetMapping("/citas/medico/{medicoId}")
     public ResponseEntity<?> obtenerCitasPorMedico(
-            @RequestBody CitaDto entrada) {
-        if (entrada.getMedicoId() == null) {
+            @PathVariable Integer medicoId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fechaDesde,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fechaHasta) {
+        if (medicoId == null) {
             return ResponseEntity.badRequest().body("El ID del médico no puede ser nulo.");
         }
         ConnectionUtil db = new ConnectionUtil();
-        List<CitaDto> citas = db.obtenerCitasPorMedico(entrada.getMedicoId() , entrada.getFechadesde(), entrada.getFechahasta());
+        List<CitaDto> citas = db.obtenerCitasPorMedico(medicoId, fechaDesde, fechaHasta);
         for (CitaDto cita : citas) {
             populateCitaDtoDetails(cita, db);
         }
         return ResponseEntity.ok(citas);
     }
 
-    @PostMapping("/citas-estado")
-    public ResponseEntity<String> actualizarEstadoCita(@RequestBody  CitaDto entrada,
+    @PutMapping("/citas/{id}/estado")
+    public ResponseEntity<String> actualizarEstadoCita(@PathVariable Integer id,
                                                        @RequestBody Map<String, String> payload) {
-        if (entrada.getCitaId() == null) {
+        if (id == null) {
             return ResponseEntity.badRequest().body("El ID de la cita no puede ser nulo.");
         }
         String nuevoEstado = payload.get("estado");
@@ -477,12 +455,12 @@ public class CitaMedicaController {
         }
 
         ConnectionUtil db = new ConnectionUtil();
-        CitaDto citaExistente = db.obtenerCitaPorId(entrada.getCitaId());
+        CitaDto citaExistente = db.obtenerCitaPorId(id);
         if (citaExistente == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cita no encontrada con ID: " + entrada.getCitaId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cita no encontrada con ID: " + id);
         }
 
-        String resultado = db.actualizarEstadoCita(entrada.getCitaId(), nuevoEstado, notasMedico);
+        String resultado = db.actualizarEstadoCita(id, nuevoEstado, notasMedico);
         if ("SUCCESS".equals(resultado)) {
             return ResponseEntity.ok("Estado de la cita actualizado correctamente.");
         } else {
@@ -490,10 +468,10 @@ public class CitaMedicaController {
         }
     }
 
-    @PostMapping("/citas-reprogramar")
-    public ResponseEntity<String> reprogramarCita(@RequestBody  CitaDto entrada,
+    @PutMapping("/citas/{id}/reprogramar")
+    public ResponseEntity<String> reprogramarCita(@PathVariable Integer id,
                                                   @RequestBody Map<String, Object> payload) {
-        if (entrada.getCitaId() == null) {
+        if (id == null) {
             return ResponseEntity.badRequest().body("El ID de la cita no puede ser nulo.");
         }
 
@@ -516,12 +494,12 @@ public class CitaMedicaController {
 
 
         ConnectionUtil db = new ConnectionUtil();
-        CitaDto citaExistente = db.obtenerCitaPorId(entrada.getCitaId());
+        CitaDto citaExistente = db.obtenerCitaPorId(id);
         if (citaExistente == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cita no encontrada con ID: " + entrada.getCitaId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cita no encontrada con ID: " + id);
         }
 
-        String resultado = db.reprogramarCita(entrada.getCitaId(), nuevaFechaHora, notasPaciente);
+        String resultado = db.reprogramarCita(id, nuevaFechaHora, notasPaciente);
         if ("SUCCESS".equals(resultado)) {
             return ResponseEntity.ok("Cita reprogramada correctamente.");
         } else {
@@ -534,109 +512,24 @@ public class CitaMedicaController {
         if (cita == null) return;
 
         if (cita.getPacienteId() != null) {
-            PacienteDto paciente = db.obtenerPacientePorId_new(cita.getPacienteId());
+            PacienteDto paciente = db.obtenerPacientePorId(cita.getPacienteId());
             if (paciente != null) {
                 cita.setPacienteNombreCompleto(paciente.getNombre() + " " + paciente.getApellido());
             }
         }
 
         if (cita.getMedicoId() != null) {
-            MedicosDto medico = db.obtenerMedicoPorId_new(cita.getMedicoId());
+            MedicosDto medico = db.obtenerMedicoPorId(cita.getMedicoId());
             if (medico != null) {
                 cita.setMedicoNombreCompleto(medico.getNombre() + " " + medico.getApellido());
                 if (medico.getEspecialidadId() != null) {
-                    EspecialidadDto especialidad = db.obtenerEspecialidadPorId_new(medico.getEspecialidadId());
+                    EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medico.getEspecialidadId());
                     if (especialidad != null) {
                         cita.setMedicoEspecialidad(especialidad.getNombre());
                     }
                 }
             }
         }
-    }
-
-
-
-    @PostMapping("/historias")
-    public ResponseEntity<?> crearHistoriaMedica(@RequestBody CrearHistoriaMedicaRequestDto requestDto) {
-        if (requestDto == null || requestDto.getPacienteId() == null || requestDto.getMedicoId() == null) {
-            return ResponseEntity.badRequest().body("Paciente ID y Médico ID son obligatorios para crear una historia médica.");
-        }
-
-        ConnectionUtil db = new ConnectionUtil();
-
-        // Optional: Validate Paciente and Medico existence if not handled by DB foreign keys or if a clearer error is desired
-        if (db.obtenerPacientePorId(requestDto.getPacienteId()) == null) {
-            return ResponseEntity.badRequest().body("Error: El paciente con ID " + requestDto.getPacienteId() + " no existe.");
-        }
-        if (db.obtenerMedicoPorId(requestDto.getMedicoId()) == null) {
-            return ResponseEntity.badRequest().body("Error: El médico con ID " + requestDto.getMedicoId() + " no existe.");
-        }
-        // Optional: Validate Cita existence if citaId is provided and must be valid
-        if (requestDto.getCitaId() != null && db.obtenerCitaPorId(requestDto.getCitaId()) == null) {
-            return ResponseEntity.badRequest().body("Error: La cita con ID " + requestDto.getCitaId() + " no existe.");
-        }
-
-
-        try {
-            Integer nuevaHistoriaId = db.crearHistoriaMedica(requestDto);
-            if (nuevaHistoriaId != null) {
-                HistoriaMedicaDto historiaMedica = db.obtenerHistoriaMedicaPorId(nuevaHistoriaId);
-                if (historiaMedica != null) {
-                    // populateHistoriaMedicaDtoDetails(historiaMedica, db); // If needed later
-                    return ResponseEntity.status(HttpStatus.CREATED).body(historiaMedica);
-                } else {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Historia médica creada pero no se pudo recuperar el registro completo. ID: " + nuevaHistoriaId);
-                }
-            } else {
-                // This could be due to FK violation if IDs were checked but deleted just before, or other DB errors
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la historia médica. Verifique los datos proporcionados (IDs de paciente, médico, cita).");
-            }
-        } catch (Exception e) {
-            // Log exception e
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor al crear la historia médica: " + e.getMessage());
-        }
-    }
-
-
-    @PostMapping("/consulta-programacion")
-    public List<programacionDto> consultaprogramacion(@RequestBody programacionDto entrada){
-
-        List<programacionDto> solicitudes = new ArrayList<programacionDto>();
-        ConnectionUtil db = new ConnectionUtil();
-        solicitudes = db.consultar_programacion(entrada.getProgramacionid());
-
-
-        return solicitudes;
-    }
-
-
-
-    @PostMapping("/registrar-programacion")
-    public Resultado registrarinventario(@RequestBody programacionDto registro){
-
-
-        ConnectionUtil db = new ConnectionUtil();
-        Resultado solicitudes = new Resultado();
-        solicitudes = db.registrar_programacion(registro
-        );
-
-        return solicitudes;
-    }
-
-    @PostMapping("/registrar-programacion-det")
-    public Resultado registrarinventariodos(@RequestBody DetalleProgramacionDto registro){
-
-
-        ConnectionUtil db = new ConnectionUtil();
-        Resultado solicitudes = new Resultado();
-
-        List<programacionDto> detprograma = registro.getDetalleprogramacion();
-
-        for (programacionDto programa : detprograma) {
-            solicitudes = db.registrar_programacion(programa
-            );
-        }
-        return solicitudes;
     }
 
 

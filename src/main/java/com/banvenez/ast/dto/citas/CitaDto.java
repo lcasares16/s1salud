@@ -17,17 +17,11 @@ public class CitaDto {
     private Integer medicoId;
     private String  medicoNombreCompleto;
     private String  medicoEspecialidad;
-    private String fechaHora;
+    private Date fechaHora;
     private String  motivo;
     private String  estado;
     private String  notasMedico;
     private String  notasPaciente;
     private Date    fechaCreacion;
     private Date    fechaActualizacion;
-    private Date    fechadesde;
-    private Date    fechahasta;
-    private String  numerocontrato;
-    private Integer  codigosuscripcion;
-    private Integer  cedula;
-
 }
