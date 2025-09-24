@@ -8133,6 +8133,70 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         return resp;
     }
 
+    public List<MedicosDto> obtenerMedico_new(Integer medicoId) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<MedicosDto> citas = new ArrayList<>();
+        List<MedicosDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(
+                    conexion.getUrl() + conexion.getDbname(),
+                    conexion.getUser(),
+                    conexion.getPass()
+            );
+            conn.setAutoCommit(false);
+
+            if (conn != null) {
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos(?)}");
+                stmt.registerOutParameter(1, Types.OTHER);
+                if (medicoId != null) {
+                    stmt.setInt(2, medicoId);
+                } else {
+                    stmt.setNull(2, Types.INTEGER);
+                }
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1);
+
+                while (rs.next()) {
+
+
+                    MedicosDto sol = new MedicosDto();
+
+                    sol.setMedicoId(rs.getInt("medico_id"));
+                    sol.setCedula(rs.getString("cedula"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setApellido(rs.getString("apellido"));
+                    sol.setEspecialidadId(rs.getInt("especialidad_id"));
+                    sol.setTelefono(rs.getString("telefono"));
+                    sol.setCorreoElectronico(rs.getString("correo_electronico"));
+                    sol.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                    sol.setEstatus(rs.getString("estatus"));
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
 
 
 

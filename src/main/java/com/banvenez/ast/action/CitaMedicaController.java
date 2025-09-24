@@ -227,6 +227,17 @@ public class CitaMedicaController {
 
     // --- Endpoints para Médicos ---
 
+    @PostMapping("/consulta-medicos")
+    public List<MedicosDto> consultamedicos(@RequestBody MedicosDto entrada){
+
+        List<MedicosDto> solicitudes = new ArrayList<MedicosDto>();
+        ConnectionUtil db = new ConnectionUtil();
+        solicitudes = db.obtenerMedico_new(entrada.getMedicoId());
+
+
+        return solicitudes;
+    }
+
     @PostMapping("/medicos")
     public ResponseEntity<?> crearMedico(@RequestBody MedicosDto medicoDto) {
         if (medicoDto == null || medicoDto.getCedula() == null || medicoDto.getCedula().trim().isEmpty() ||
