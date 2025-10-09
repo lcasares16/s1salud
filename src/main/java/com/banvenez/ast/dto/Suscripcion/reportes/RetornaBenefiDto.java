@@ -21,4 +21,6 @@ public class RetornaBenefiDto {
     private Double gastosclinicas;
     private Double saldoactual;
     private String plan;
+
+
 }

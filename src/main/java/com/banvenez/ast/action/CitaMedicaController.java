@@ -1,6 +1,9 @@
 package com.banvenez.ast.action;
+import com.banvenez.ast.dto.Contratos.SucursalDto;
 import com.banvenez.ast.dto.Suscripcion.CargaMasivaDto;
 import com.banvenez.ast.dto.Suscripcion.CargaPrincipalDto;
+import com.banvenez.ast.dto.Suscripcion.reportes.CedulaBeneficiarioDto;
+import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
 import com.banvenez.ast.dto.administracion.RetornoCobraCuotasDto;
 import com.banvenez.ast.dto.citas.*;
 import com.banvenez.ast.dto.farmacia.DetFacturaDto;
@@ -232,7 +235,8 @@ public class CitaMedicaController {
 
         List<MedicosDto> solicitudes = new ArrayList<MedicosDto>();
         ConnectionUtil db = new ConnectionUtil();
-        solicitudes = db.obtenerMedico_new(entrada.getMedicoId());
+        solicitudes = db.obtenerMedico_new(entrada.getMedicoId(),
+                                           entrada.getIdclinica());
 
 
         return solicitudes;
@@ -650,5 +654,42 @@ public class CitaMedicaController {
         return solicitudes;
     }
 
+    @PostMapping("/clinicas")
+    public List<SucursalDto> sucursal(){
+
+        List<SucursalDto> solicitudes = new ArrayList<>();
+
+
+        ConnectionUtil db = new ConnectionUtil();
+
+        solicitudes = db.ClinicA();
+        //db.createTable(conn, "recovery");
+
+
+
+        return solicitudes;
+
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+    @PostMapping("/CitasBeneficiario")
+    public List<CitasBenefiDto> consultabeneficiario(@RequestBody CedulaBeneficiarioDto entrada){
+
+        List<CitasBenefiDto> solicitudes = new ArrayList<>();
+
+
+        ConnectionUtil db = new ConnectionUtil();
+
+        solicitudes = db.ConsultaBeneficiarioCitas(entrada.getCedula()
+        );
+
+
+
+
+        return solicitudes;
+
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
 
 }

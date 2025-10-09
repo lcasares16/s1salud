@@ -2757,6 +2757,8 @@ public List<RamoSubRamoDto> RamoSubRamo(String ramo) {
         return resp;
     }
 
+
+
     ///////////////Localidad
 public List<LocalidadDto> Localidad() {
 
@@ -8133,7 +8135,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         return resp;
     }
 
-    public List<MedicosDto> obtenerMedico_new(Integer medicoId) {
+    public List<MedicosDto> obtenerMedico_new(Integer medicoId, String clinica) {
         Connection conn = null;
         ConexionDto conexion = new ConexionDto();
         List<MedicosDto> citas = new ArrayList<>();
@@ -8149,12 +8151,17 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
             conn.setAutoCommit(false);
 
             if (conn != null) {
-                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos(?)}");
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos(?,?)}");
                 stmt.registerOutParameter(1, Types.OTHER);
                 if (medicoId != null) {
                     stmt.setInt(2, medicoId);
                 } else {
                     stmt.setNull(2, Types.INTEGER);
+                }
+                if (clinica != null) {
+                    stmt.setString(3, clinica);
+                } else {
+                    stmt.setNull(3, Types.VARCHAR);
                 }
 
                 stmt.execute();
@@ -8176,6 +8183,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                     sol.setCorreoElectronico(rs.getString("correo_electronico"));
                     sol.setFechaRegistro(rs.getTimestamp("fecha_registro"));
                     sol.setEstatus(rs.getString("estatus"));
+                    sol.setIdclinica(rs.getString("id_clinica"));
 
 
 
@@ -10533,6 +10541,127 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
         return resp;
     }
+    ///////////////sucursal
+    public List<SucursalDto> ClinicA() {
 
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<SucursalDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.consulta_clinicas()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+                    SucursalDto sol = new SucursalDto();
+                    ObjectMapper mapper = new ObjectMapper();
+                    //  RespConsSuscripDto obj = mapper.readValue("",RespConsSuscripDto.class);
+
+                    sol.setCodigo_sucursal(rs.getInt("codigo_sucursal"));
+                    sol.setDescripcion(rs.getString("descripcion"));
+
+
+
+
+
+                    resp.add(sol);
+                }
+                ObjectMapper mapper = new ObjectMapper();
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<CitasBenefiDto> ConsultaBeneficiarioCitas(Integer cedula
+
+    ) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        //RetornaDto resp = new RetornaDto();
+        List<CitasBenefiDto> resp =   new ArrayList<>();
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{call citas_medicas.consulta_beneficiario(?)}");
+                //LocalDate localDate = LocalDate.of(fechaMovimiento);
+                //  java.sql.Date sqlDate = java.sql.Date.valueOf(fechaMovimiento);
+
+                stmt.registerOutParameter(1, Types.OTHER);
+                stmt.setInt(1, cedula);
+
+
+
+                stmt.execute();
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+                    CitasBenefiDto sol = new CitasBenefiDto();
+
+                    sol.setContrato(rs.getString("contrato"));
+                    sol.setContratante(rs.getString("contratante"));
+                    sol.setCedula(rs.getInt("cedula"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setFechadesde(rs.getString("fecha_desde"));
+                    sol.setFechahasta(rs.getString("fecha_hasta"));
+                    sol.setSuscripcion(rs.getInt("suscripcion"));
+                    sol.setEstatus(rs.getString("status"));
+
+
+
+                    resp.add(sol);
+                }
+
+
+
+                conn.commit();
+
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
 
 }
