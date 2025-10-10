@@ -388,7 +388,7 @@ public class CitaMedicaController {
     @PostMapping("/crea-citas")
     public ResponseEntity<?> crearCita(@RequestBody CrearCitaRequestDto citaRequestDto) {
         if (citaRequestDto == null || citaRequestDto.getPacienteId() == null ||
-                citaRequestDto.getMedicoId() == null || citaRequestDto.getFechaHora() == null) {
+                citaRequestDto.getMedicoId() == null || citaRequestDto.getFecha() == null) {
             return ResponseEntity.badRequest().body("Paciente ID, Médico ID y Fecha/Hora son obligatorios para crear una cita.");
         }
 
@@ -451,33 +451,33 @@ public class CitaMedicaController {
 
 
 
-    @PostMapping("/citas-paciente")
-    public ResponseEntity<?> obtenerCitasPorPaciente(
-            @RequestBody CitaDto entrada) {
-        if (entrada.getPacienteId() == null) {
-            return ResponseEntity.badRequest().body("El ID del paciente no puede ser nulo.");
-        }
-        ConnectionUtil db = new ConnectionUtil();
-        List<CitaDto> citas = db.obtenerCitasPorPaciente(entrada.getPacienteId(), entrada.getFechadesde(), entrada.getFechahasta());
-        for (CitaDto cita : citas) {
-            populateCitaDtoDetails(cita, db);
-        }
-        return ResponseEntity.ok(citas);
-    }
+//    @PostMapping("/citas-paciente")
+//    public ResponseEntity<?> obtenerCitasPorPaciente(
+//            @RequestBody CitaDto entrada) {
+//        if (entrada.getPacienteId() == null) {
+//            return ResponseEntity.badRequest().body("El ID del paciente no puede ser nulo.");
+//        }
+//        ConnectionUtil db = new ConnectionUtil();
+////        List<CitaDto> citas = db.obtenerCitasPorPaciente(entrada.getPacienteId(), entrada.getFechadesde(), entrada.getFechahasta());
+////        for (CitaDto cita : citas) {
+////            populateCitaDtoDetails(cita, db);
+////        }
+//        return ResponseEntity.ok(citas);
+//    }
 
-    @PostMapping("/citas-medico")
-    public ResponseEntity<?> obtenerCitasPorMedico(
-            @RequestBody CitaDto entrada) {
-        if (entrada.getMedicoId() == null) {
-            return ResponseEntity.badRequest().body("El ID del médico no puede ser nulo.");
-        }
-        ConnectionUtil db = new ConnectionUtil();
-        List<CitaDto> citas = db.obtenerCitasPorMedico(entrada.getMedicoId() , entrada.getFechadesde(), entrada.getFechahasta());
-        for (CitaDto cita : citas) {
-            populateCitaDtoDetails(cita, db);
-        }
-        return ResponseEntity.ok(citas);
-    }
+//    @PostMapping("/citas-medico")
+//    public ResponseEntity<?> obtenerCitasPorMedico(
+//            @RequestBody CitaDto entrada) {
+//        if (entrada.getMedicoId() == null) {
+//            return ResponseEntity.badRequest().body("El ID del médico no puede ser nulo.");
+//        }
+//        ConnectionUtil db = new ConnectionUtil();
+//        List<CitaDto> citas = db.obtenerCitasPorMedico(entrada.getMedicoId() , entrada.getFechadesde(), entrada.getFechahasta());
+//        for (CitaDto cita : citas) {
+//            populateCitaDtoDetails(cita, db);
+//        }
+//        return ResponseEntity.ok(citas);
+//    }
 
     @PostMapping("/citas-estado")
     public ResponseEntity<String> actualizarEstadoCita(@RequestBody  CitaDto entrada,

@@ -8106,13 +8106,28 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
                   sol.setCitaId(rs.getInt("cita_id"));
                   sol.setPacienteId(rs.getInt("paciente_id"));
+                  sol.setPacienteNombreCompleto(rs.getString("nombrepaciente"));
                   sol.setMedicoId(rs.getInt("medico_id"));
+                  sol.setMedicoNombreCompleto(rs.getString("nombremedico"));
+                  sol.setEspecialidad(rs.getInt("especialidad"));
+                  sol.setMedicoEspecialidad(rs.getString("medicoEspecialidad"));
                   sol.setFechaHora(rs.getString("fecha_hora"));
                   sol.setMotivo(rs.getString("motivo"));
-                  sol.setEstado(rs.getString("estado"));
+                  sol.setNotasMedico(rs.getString("notas_medico"));
+                  sol.setNotasPaciente(rs.getString("notas_paciente"));
+                  sol.setFechaCreacion(rs.getString("fecha_creacion"));
+                  sol.setFechaActualizacion(rs.getString("fecha_actualizacion"));
                   sol.setNumerocontrato(rs.getString("numero_contrato"));
                   sol.setCodigosuscripcion(rs.getInt("codigo_suscripcion"));
                   sol.setCedula(rs.getInt("cedula"));
+                  sol.setClaveclinica(rs.getInt("clave_clinica"));
+                  sol.setClinicaid(rs.getInt("clinica_id"));
+                  sol.setNombreclinica(rs.getString("nombreclinica"));
+                  sol.setEstado(rs.getInt("estado"));
+                  sol.setEstatus(rs.getString("estatus"));
+
+
+
 
 
 
@@ -8704,14 +8719,14 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 stmt.registerOutParameter(1, Types.INTEGER); // Set the output parameter type
                 stmt.setInt(2, citaRequest.getPacienteId());
                 stmt.setInt(3, citaRequest.getMedicoId());
-                stmt.setString(4, citaRequest.getFechaHora());
+                stmt.setString(4, citaRequest.getFecha());
                 stmt.setString(5, citaRequest.getMotivo());
                 stmt.setString(6, citaRequest.getNotasPaciente());
-                stmt.setString(7, citaRequest.getNumerocontrato());
-                stmt.setInt(8, citaRequest.getCodigosuscripcion());
+                stmt.setString(7, citaRequest.getContrato());
+                stmt.setInt(8, citaRequest.getSuscripcion());
                 stmt.setInt(9, citaRequest.getCedula());
-                stmt.setString(10, citaRequest.getClinicaid());
-                stmt.setInt(11, citaRequest.getEstado());
+                stmt.setString(10, citaRequest.getClinica());
+                stmt.setInt(11, citaRequest.getEstatus());
 
 
 
@@ -8762,11 +8777,11 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
             stmt.registerOutParameter(1, Types.INTEGER);
             stmt.setInt(2, citaRequest.getPacienteId());
             stmt.setInt(3, citaRequest.getMedicoId());
-            stmt.setString(4,citaRequest.getFechaHora());
+            stmt.setString(4,citaRequest.getFecha());
             stmt.setString(5, citaRequest.getMotivo());
             stmt.setString(6, citaRequest.getNotasPaciente());
-            stmt.setString(7, citaRequest.getNumerocontrato());
-            stmt.setInt(8, citaRequest.getCodigosuscripcion());
+            stmt.setString(7, citaRequest.getContrato());
+            stmt.setInt(8, citaRequest.getSuscripcion());
             stmt.setInt(9, citaRequest.getCedula());
             stmt.setString(10, "Programada"); // Default estado as per SP definition
 
@@ -8805,11 +8820,11 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         cita.setMedicoId(rs.getInt("medico_id"));
         cita.setFechaHora(rs.getString("fecha_hora"));
         cita.setMotivo(rs.getString("motivo"));
-        cita.setEstado(rs.getString("estado"));
+     //   cita.setEstado(rs.getString("estado"));
         cita.setNotasMedico(rs.getString("notas_medico"));
         cita.setNotasPaciente(rs.getString("notas_paciente"));
-        cita.setFechaCreacion(rs.getTimestamp("fecha_creacion"));
-        cita.setFechaActualizacion(rs.getTimestamp("fecha_actualizacion"));
+       // cita.setFechaCreacion(rs.getTimestamp("fecha_creacion"));
+       // cita.setFechaActualizacion(rs.getTimestamp("fecha_actualizacion"));
         cita.setNumerocontrato(rs.getString("numero_contrato"));
         cita.setCodigosuscripcion(rs.getInt("codigo_suscripcion"));
         cita.setCedula(rs.getInt("cedula"));

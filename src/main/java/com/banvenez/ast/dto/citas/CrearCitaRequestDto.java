@@ -1,5 +1,6 @@
 package com.banvenez.ast.dto.citas;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -13,17 +14,25 @@ import java.util.Date;
 public class CrearCitaRequestDto {
 
     private Integer citaId;
+
     private Integer pacienteId;
+
     private Integer medicoId;
-    private String  fechaHora;
+
+    private String  fecha;
     private String  motivo;
-    private Integer  estado;
+
+    private Integer  estatus;
+
     private String  notasMedico;
     private String  notasPaciente;
     private Date    fechaCreacion;
     private Date    fechaActualizacion;
-    private String  numerocontrato;
-    private Integer codigosuscripcion;
+
+    private String  contrato;
+
+    private Integer suscripcion;
     private Integer cedula;
-    private String clinicaid;
+
+    private String clinica;
 }
