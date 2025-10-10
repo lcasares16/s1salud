@@ -7,6 +7,7 @@ import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
 import com.banvenez.ast.dto.administracion.RetornoCobraCuotasDto;
 import com.banvenez.ast.dto.citas.*;
 import com.banvenez.ast.dto.farmacia.DetFacturaDto;
+import com.banvenez.ast.dto.farmacia.Estados;
 import com.banvenez.ast.dto.farmacia.RegistrarInventarioDto;
 import com.banvenez.ast.dto.farmacia.Resultado;
 import com.banvenez.ast.util.ConnectionUtil;
@@ -684,6 +685,37 @@ public class CitaMedicaController {
         );
 
 
+
+
+        return solicitudes;
+
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+
+    @PostMapping("/crear-citas")
+    public ClaveDto crearCitas(@RequestBody CrearCitaRequestDto citaRequestDto) {
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        ClaveDto solicitudes = new ClaveDto();
+
+        solicitudes = db.creanuevacita(citaRequestDto);
+
+        return solicitudes;
+
+
+    }
+
+    @PostMapping("/estatus-citas")
+    public List<Estados> Listacitas(){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+
+        List<Estados> solicitudes = new ArrayList<Estados>();
+        solicitudes = db.Estatuscitas();
 
 
         return solicitudes;

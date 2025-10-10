@@ -15,9 +15,9 @@ public class CrearCitaRequestDto {
     private Integer citaId;
     private Integer pacienteId;
     private Integer medicoId;
-    private Date    fechaHora;
+    private String  fechaHora;
     private String  motivo;
-    private String  estado;
+    private Integer  estado;
     private String  notasMedico;
     private String  notasPaciente;
     private Date    fechaCreacion;
@@ -25,4 +25,5 @@ public class CrearCitaRequestDto {
     private String  numerocontrato;
     private Integer codigosuscripcion;
     private Integer cedula;
+    private String clinicaid;
 }
