@@ -34,5 +34,6 @@ public class CitaDto {
     private String nombreclinica;
     private Integer  estado;
     private String   estatus;
+    private String   contratante;
 
 }

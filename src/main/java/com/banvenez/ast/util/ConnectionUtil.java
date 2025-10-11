@@ -8125,6 +8125,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                   sol.setNombreclinica(rs.getString("nombreclinica"));
                   sol.setEstado(rs.getInt("estado"));
                   sol.setEstatus(rs.getString("estatus"));
+                  sol.setContratante(rs.getString("contratante"));
 
 
 
