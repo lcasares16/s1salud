@@ -8126,6 +8126,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                   sol.setEstado(rs.getInt("estado"));
                   sol.setEstatus(rs.getString("estatus"));
                   sol.setContratante(rs.getString("contratante"));
+                  sol.setPrecio(rs.getDouble("precio"));
 
 
 
@@ -8737,6 +8738,61 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 sol.setClave(resultado);
                 // resp.((resultado));
                 resp.setClave((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+
+    public RespuestaCitasDto actualizaCitasNew(ActulizaCitaDto citaRequest) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        RespuestaCitasDto resp =   new RespuestaCitasDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.actualizar_citas(?, ?, ?, ?)}");
+                stmt.registerOutParameter(1, Types.VARCHAR); // Set the output parameter type
+                stmt.setInt(2, citaRequest.getCitaid());
+                stmt.setString(3, citaRequest.getFecha_hora());
+                stmt.setInt(4, citaRequest.getEstado());
+                stmt.setString(5, citaRequest.getUsuario());
+
+
+
+
+                stmt.execute();
+                String resultado = stmt.getString(1);
+                RespuestaCitasDto sol = new RespuestaCitasDto();
+                sol.setRespuesta(resultado);
+                // resp.((resultado));
+                resp.setRespuesta((resultado));
 
 
 

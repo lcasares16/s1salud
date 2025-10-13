@@ -724,4 +724,18 @@ public class CitaMedicaController {
 
     }
 
+    @PostMapping("/actualiza-citas")
+    public RespuestaCitasDto ActualizaCitas(@RequestBody ActulizaCitaDto citaRequestDto) {
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        RespuestaCitasDto solicitudes = new RespuestaCitasDto();
+
+        solicitudes = db.actualizaCitasNew(citaRequestDto);
+
+        return solicitudes;
+
+
+    }
+
 }

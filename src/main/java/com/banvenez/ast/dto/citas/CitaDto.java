@@ -35,5 +35,6 @@ public class CitaDto {
     private Integer  estado;
     private String   estatus;
     private String   contratante;
+    private Double  precio;
 
 }
