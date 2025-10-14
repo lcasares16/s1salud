@@ -8071,7 +8071,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
     }
 
-    public List<CitaDto> obtenerCitaPorId_new(Integer citaId) {
+    public List<CitaDto> obtenerCitaPorId_new(Integer citaId, Integer cedula) {
         Connection conn = null;
         ConexionDto conexion = new ConexionDto();
         List<CitaDto> citas = new ArrayList<>();
@@ -8087,12 +8087,17 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
             conn.setAutoCommit(false);
 
             if (conn != null) {
-                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_cita_por_id(?)}");
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_cita_por_id(?,?)}");
                 stmt.registerOutParameter(1, Types.OTHER);
                 if (citaId != null) {
                     stmt.setInt(2, citaId);
                 } else {
                     stmt.setNull(2, Types.INTEGER);
+                }
+                if (cedula != null) {
+                    stmt.setInt(3, cedula);
+                } else {
+                    stmt.setNull(3, Types.INTEGER);
                 }
 
                 stmt.execute();

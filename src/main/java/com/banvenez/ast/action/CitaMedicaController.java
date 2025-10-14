@@ -443,7 +443,8 @@ public class CitaMedicaController {
 
         List<CitaDto> solicitudes = new ArrayList<CitaDto>();
         ConnectionUtil db = new ConnectionUtil();
-        solicitudes = db.obtenerCitaPorId_new(entrada.getCitaId());
+        solicitudes = db.obtenerCitaPorId_new(entrada.getCitaId(),
+                entrada.getCedula());
 
 
         return solicitudes;
