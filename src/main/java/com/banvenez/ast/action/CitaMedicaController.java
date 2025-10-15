@@ -739,4 +739,17 @@ public class CitaMedicaController {
 
     }
 
+    @PostMapping("/consulta-medicos_actual")
+    public List<ConsultaMedicosDto> consultamedicosactula(@RequestBody MedicosDto entrada){
+
+        List<ConsultaMedicosDto> solicitudes = new ArrayList<ConsultaMedicosDto>();
+        ConnectionUtil db = new ConnectionUtil();
+        solicitudes = db.obtenerMedicoActual(entrada.getMedicoId(),
+                entrada.getIdclinica());
+
+
+        return solicitudes;
+    }
+
+
 }

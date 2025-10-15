@@ -8231,6 +8231,83 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
 
 
+    public List<ConsultaMedicosDto> obtenerMedicoActual(Integer medicoId, String clinica) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<ConsultaMedicosDto> citas = new ArrayList<>();
+        List<ConsultaMedicosDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(
+                    conexion.getUrl() + conexion.getDbname(),
+                    conexion.getUser(),
+                    conexion.getPass()
+            );
+            conn.setAutoCommit(false);
+
+            if (conn != null) {
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos(?,?)}");
+                stmt.registerOutParameter(1, Types.OTHER);
+                if (medicoId != null) {
+                    stmt.setInt(2, medicoId);
+                } else {
+                    stmt.setNull(2, Types.INTEGER);
+                }
+                if (clinica != null) {
+                    stmt.setString(3, clinica);
+                } else {
+                    stmt.setNull(3, Types.VARCHAR);
+                }
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1);
+
+                while (rs.next()) {
+
+
+                    ConsultaMedicosDto sol = new ConsultaMedicosDto();
+
+                    sol.setMedicoId(rs.getInt("medico_id"));
+                    sol.setCedula(rs.getString("cedula"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setApellido(rs.getString("apellido"));
+                    sol.setEspecialidadId(rs.getInt("especialidad_id"));
+                    sol.setNombreEspecialidad(rs.getString("nombreEspecialidad"));
+                    sol.setTelefono(rs.getString("telefono"));
+                    sol.setCorreoElectronico(rs.getString("correo_electronico"));
+                    sol.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                    sol.setId_estatus(rs.getString("id_estatus"));
+                    sol.setEstatus(rs.getString("estatus"));
+                    sol.setIdclinica(rs.getString("id_clinica"));
+                    sol.setNombreclinica(rs.getString("nombreclinica"));
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+
     public PacienteDto obtenerPacientePorCedula(String cedula) {
         Connection conn = null;
         ConexionDto conexion = new ConexionDto();
