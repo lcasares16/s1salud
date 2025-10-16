@@ -243,182 +243,182 @@ public class CitaMedicaController {
         return solicitudes;
     }
 
-    @PostMapping("/medicos")
-    public ResponseEntity<?> crearMedico(@RequestBody MedicosDto medicoDto) {
-        if (medicoDto == null || medicoDto.getCedula() == null || medicoDto.getCedula().trim().isEmpty() ||
-                medicoDto.getNombre() == null || medicoDto.getNombre().trim().isEmpty() ||
-                medicoDto.getApellido() == null || medicoDto.getApellido().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Cédula, nombre y apellido del médico son obligatorios.");
-        }
-        // especialidadId is optional at DTO level, SP handles null.
+//    @PostMapping("/medicos")
+//    public ResponseEntity<?> crearMedico(@RequestBody MedicosDto medicoDto) {
+//        if (medicoDto == null || medicoDto.getCedula() == null || medicoDto.getCedula().trim().isEmpty() ||
+//                medicoDto.getNombre() == null || medicoDto.getNombre().trim().isEmpty() ||
+//                medicoDto.getApellido() == null || medicoDto.getApellido().trim().isEmpty()) {
+//            return ResponseEntity.badRequest().body("Cédula, nombre y apellido del médico son obligatorios.");
+//        }
+//        // especialidadId is optional at DTO level, SP handles null.
+//
+//        ConnectionUtil db = new ConnectionUtil();
+//        Integer nuevoMedicoId = db.crearMedico(medicoDto);
+//
+//        if (nuevoMedicoId != null) {
+//            medicoDto.setMedicoId(nuevoMedicoId);
+//            // Optionally re-fetch to get default values like fecha_registro and to confirm especialidadId linkage
+//            MedicosDto fetchedMedico = db.obtenerMedicoPorId(nuevoMedicoId);
+//            if (fetchedMedico != null) {
+//                // If nombreEspecialidad is not populated by SP, we might need to fetch it here
+//                // For now, assume SP might be enhanced or it's handled client-side/later
+//                if (fetchedMedico.getEspecialidadId() != null && fetchedMedico.getNombreEspecialidad() == null) {
+//                    EspecialidadDto especialidad = db.obtenerEspecialidadPorId(fetchedMedico.getEspecialidadId());
+//                    if (especialidad != null) {
+//                        fetchedMedico.setNombreEspecialidad(especialidad.getNombre());
+//                    }
+//                }
+//                return ResponseEntity.status(HttpStatus.CREATED).body(fetchedMedico);
+//            }
+//            return ResponseEntity.status(HttpStatus.CREATED).body(medicoDto);
+//        } else {
+//            // Attempt to check for duplicate cedula if creation failed
+//            // This is a basic check, more robust error reporting from ConnectionUtil would be better
+//            List<MedicosDto> existingMedicos = db.obtenerMedicos(); // Less efficient, better to have a getByCedula for Medico
+//            boolean cedulaExists = existingMedicos.stream().anyMatch(m -> m.getCedula().equals(medicoDto.getCedula()));
+//            if (cedulaExists) {
+//                return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: El médico con la cédula '" + medicoDto.getCedula() + "' ya existe.");
+//            }
+//            if (medicoDto.getEspecialidadId() != null) {
+//                EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medicoDto.getEspecialidadId());
+//                if (especialidad == null) {
+//                    return ResponseEntity.badRequest().body("Error: La especialidad_id " + medicoDto.getEspecialidadId() + " no existe.");
+//                }
+//            }
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear el médico. Verifique los datos, especialmente la especialidad ID.");
+//        }
+//    }
 
-        ConnectionUtil db = new ConnectionUtil();
-        Integer nuevoMedicoId = db.crearMedico(medicoDto);
+//    @GetMapping("/medicos")
+//    public ResponseEntity<List<MedicosDto>> obtenerMedicos() {
+//        ConnectionUtil db = new ConnectionUtil();
+//        List<MedicosDto> medicos = db.obtenerMedicos();
+//        // Populate nombreEspecialidad for each medico
+//        for (MedicosDto medico : medicos) {
+//            if (medico.getEspecialidadId() != null && medico.getNombreEspecialidad() == null) {
+//                EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medico.getEspecialidadId());
+//                if (especialidad != null) {
+//                    medico.setNombreEspecialidad(especialidad.getNombre());
+//                }
+//            }
+//        }
+//        return ResponseEntity.ok(medicos);
+//    }
+//
+//    @GetMapping("/medicos/{id}")
+//    public ResponseEntity<?> obtenerMedicoPorId(@PathVariable Integer id) {
+//        if (id == null) {
+//            return ResponseEntity.badRequest().body("El ID del médico no puede ser nulo.");
+//        }
+//        ConnectionUtil db = new ConnectionUtil();
+//        MedicosDto medico = db.obtenerMedicoPorId(id);
+//        if (medico != null) {
+//            if (medico.getEspecialidadId() != null && medico.getNombreEspecialidad() == null) {
+//                EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medico.getEspecialidadId());
+//                if (especialidad != null) {
+//                    medico.setNombreEspecialidad(especialidad.getNombre());
+//                }
+//            }
+//            return ResponseEntity.ok(medico);
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Médico no encontrado con ID: " + id);
+//        }
+//    }
 
-        if (nuevoMedicoId != null) {
-            medicoDto.setMedicoId(nuevoMedicoId);
-            // Optionally re-fetch to get default values like fecha_registro and to confirm especialidadId linkage
-            MedicosDto fetchedMedico = db.obtenerMedicoPorId(nuevoMedicoId);
-            if (fetchedMedico != null) {
-                // If nombreEspecialidad is not populated by SP, we might need to fetch it here
-                // For now, assume SP might be enhanced or it's handled client-side/later
-                if (fetchedMedico.getEspecialidadId() != null && fetchedMedico.getNombreEspecialidad() == null) {
-                    EspecialidadDto especialidad = db.obtenerEspecialidadPorId(fetchedMedico.getEspecialidadId());
-                    if (especialidad != null) {
-                        fetchedMedico.setNombreEspecialidad(especialidad.getNombre());
-                    }
-                }
-                return ResponseEntity.status(HttpStatus.CREATED).body(fetchedMedico);
-            }
-            return ResponseEntity.status(HttpStatus.CREATED).body(medicoDto);
-        } else {
-            // Attempt to check for duplicate cedula if creation failed
-            // This is a basic check, more robust error reporting from ConnectionUtil would be better
-            List<MedicosDto> existingMedicos = db.obtenerMedicos(); // Less efficient, better to have a getByCedula for Medico
-            boolean cedulaExists = existingMedicos.stream().anyMatch(m -> m.getCedula().equals(medicoDto.getCedula()));
-            if (cedulaExists) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: El médico con la cédula '" + medicoDto.getCedula() + "' ya existe.");
-            }
-            if (medicoDto.getEspecialidadId() != null) {
-                EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medicoDto.getEspecialidadId());
-                if (especialidad == null) {
-                    return ResponseEntity.badRequest().body("Error: La especialidad_id " + medicoDto.getEspecialidadId() + " no existe.");
-                }
-            }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear el médico. Verifique los datos, especialmente la especialidad ID.");
-        }
-    }
-
-    @GetMapping("/medicos")
-    public ResponseEntity<List<MedicosDto>> obtenerMedicos() {
-        ConnectionUtil db = new ConnectionUtil();
-        List<MedicosDto> medicos = db.obtenerMedicos();
-        // Populate nombreEspecialidad for each medico
-        for (MedicosDto medico : medicos) {
-            if (medico.getEspecialidadId() != null && medico.getNombreEspecialidad() == null) {
-                EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medico.getEspecialidadId());
-                if (especialidad != null) {
-                    medico.setNombreEspecialidad(especialidad.getNombre());
-                }
-            }
-        }
-        return ResponseEntity.ok(medicos);
-    }
-
-    @GetMapping("/medicos/{id}")
-    public ResponseEntity<?> obtenerMedicoPorId(@PathVariable Integer id) {
-        if (id == null) {
-            return ResponseEntity.badRequest().body("El ID del médico no puede ser nulo.");
-        }
-        ConnectionUtil db = new ConnectionUtil();
-        MedicosDto medico = db.obtenerMedicoPorId(id);
-        if (medico != null) {
-            if (medico.getEspecialidadId() != null && medico.getNombreEspecialidad() == null) {
-                EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medico.getEspecialidadId());
-                if (especialidad != null) {
-                    medico.setNombreEspecialidad(especialidad.getNombre());
-                }
-            }
-            return ResponseEntity.ok(medico);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Médico no encontrado con ID: " + id);
-        }
-    }
-
-    @GetMapping("/medicos/especialidad/{especialidadId}")
-    public ResponseEntity<?> obtenerMedicosPorEspecialidad(@PathVariable Integer especialidadId) {
-        if (especialidadId == null) {
-            return ResponseEntity.badRequest().body("El ID de la especialidad no puede ser nulo.");
-        }
-        ConnectionUtil db = new ConnectionUtil();
-        // First check if especialidad exists
-        EspecialidadDto especialidad = db.obtenerEspecialidadPorId(especialidadId);
-        if (especialidad == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Especialidad no encontrada con ID: " + especialidadId);
-        }
-
-        List<MedicosDto> medicos = db.obtenerMedicosPorEspecialidad(especialidadId);
-        for (MedicosDto medico : medicos) {
-            // Set nombreEspecialidad since we already fetched it
-            medico.setNombreEspecialidad(especialidad.getNombre());
-        }
-        return ResponseEntity.ok(medicos);
-    }
-
-    @PutMapping("/medicos/{id}")
-    public ResponseEntity<String> actualizarMedico(@PathVariable Integer id, @RequestBody MedicosDto medicoDto) {
-        if (id == null || medicoDto == null) {
-            return ResponseEntity.badRequest().body("ID de médico y datos son obligatorios.");
-        }
-        if (medicoDto.getCedula() == null || medicoDto.getCedula().trim().isEmpty() ||
-                medicoDto.getNombre() == null || medicoDto.getNombre().trim().isEmpty() ||
-                medicoDto.getApellido() == null || medicoDto.getApellido().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Cédula, nombre y apellido del médico son obligatorios.");
-        }
-
-        ConnectionUtil db = new ConnectionUtil();
-
-        // Check if especialidad_id is valid before attempting update if provided
-        if (medicoDto.getEspecialidadId() != null) {
-            EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medicoDto.getEspecialidadId());
-            if (especialidad == null) {
-                return ResponseEntity.badRequest().body("Error: La especialidad_id " + medicoDto.getEspecialidadId() + " no existe.");
-            }
-        }
-
-        medicoDto.setMedicoId(id); // Ensure DTO has the correct ID from path
-        String resultado = db.actualizarMedico(medicoDto);
-
-        if ("SUCCESS".equals(resultado)) {
-            return ResponseEntity.ok("Médico actualizado correctamente.");
-        } else if (resultado != null && resultado.contains("Cédula duplicada")) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(resultado);
-        } else if (resultado != null && resultado.contains("Médico no encontrado")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resultado);
-        } else if (resultado != null && resultado.contains("Especialidad ID no válida")) {
-            return ResponseEntity.badRequest().body(resultado);
-        }
-        else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar el médico: " + resultado);
-        }
-    }
+//    @GetMapping("/medicos/especialidad/{especialidadId}")
+//    public ResponseEntity<?> obtenerMedicosPorEspecialidad(@PathVariable Integer especialidadId) {
+//        if (especialidadId == null) {
+//            return ResponseEntity.badRequest().body("El ID de la especialidad no puede ser nulo.");
+//        }
+//        ConnectionUtil db = new ConnectionUtil();
+//        // First check if especialidad exists
+//        EspecialidadDto especialidad = db.obtenerEspecialidadPorId(especialidadId);
+//        if (especialidad == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Especialidad no encontrada con ID: " + especialidadId);
+//        }
+//
+//        List<MedicosDto> medicos = db.obtenerMedicosPorEspecialidad(especialidadId);
+//        for (MedicosDto medico : medicos) {
+//            // Set nombreEspecialidad since we already fetched it
+//            medico.setNombreEspecialidad(especialidad.getNombre());
+//        }
+//        return ResponseEntity.ok(medicos);
+//    }
+//
+//    @PutMapping("/medicos/{id}")
+//    public ResponseEntity<String> actualizarMedico(@PathVariable Integer id, @RequestBody MedicosDto medicoDto) {
+//        if (id == null || medicoDto == null) {
+//            return ResponseEntity.badRequest().body("ID de médico y datos son obligatorios.");
+//        }
+//        if (medicoDto.getCedula() == null || medicoDto.getCedula().trim().isEmpty() ||
+//                medicoDto.getNombre() == null || medicoDto.getNombre().trim().isEmpty() ||
+//                medicoDto.getApellido() == null || medicoDto.getApellido().trim().isEmpty()) {
+//            return ResponseEntity.badRequest().body("Cédula, nombre y apellido del médico son obligatorios.");
+//        }
+//
+//        ConnectionUtil db = new ConnectionUtil();
+//
+//        // Check if especialidad_id is valid before attempting update if provided
+//        if (medicoDto.getEspecialidadId() != null) {
+//            EspecialidadDto especialidad = db.obtenerEspecialidadPorId(medicoDto.getEspecialidadId());
+//            if (especialidad == null) {
+//                return ResponseEntity.badRequest().body("Error: La especialidad_id " + medicoDto.getEspecialidadId() + " no existe.");
+//            }
+//        }
+//
+//        medicoDto.setMedicoId(id); // Ensure DTO has the correct ID from path
+//        String resultado = db.actualizarMedico(medicoDto);
+//
+//        if ("SUCCESS".equals(resultado)) {
+//            return ResponseEntity.ok("Médico actualizado correctamente.");
+//        } else if (resultado != null && resultado.contains("Cédula duplicada")) {
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(resultado);
+//        } else if (resultado != null && resultado.contains("Médico no encontrado")) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resultado);
+//        } else if (resultado != null && resultado.contains("Especialidad ID no válida")) {
+//            return ResponseEntity.badRequest().body(resultado);
+//        }
+//        else {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar el médico: " + resultado);
+//        }
+//    }
 
     // --- Endpoints para Citas ---
 
-    @PostMapping("/crea-citas")
-    public ResponseEntity<?> crearCita(@RequestBody CrearCitaRequestDto citaRequestDto) {
-        if (citaRequestDto == null || citaRequestDto.getPacienteId() == null ||
-                citaRequestDto.getMedicoId() == null || citaRequestDto.getFecha() == null) {
-            return ResponseEntity.badRequest().body("Paciente ID, Médico ID y Fecha/Hora son obligatorios para crear una cita.");
-        }
-
-        ConnectionUtil db = new ConnectionUtil();
-
-        // Validate Paciente existence
-        if (db.obtenerPacientePorId_new(citaRequestDto.getPacienteId()) == null) {
-            return ResponseEntity.badRequest().body("Error: El paciente con ID " + citaRequestDto.getPacienteId() + " no existe.");
-        }
-        // Validate Medico existence
-//        if (db.obtenerMedicoPorId(citaRequestDto.getMedicoId()) == null) {
-//            return ResponseEntity.badRequest().body("Error: El médico con ID " + citaRequestDto.getMedicoId() + " no existe.");
+//    @PostMapping("/crea-citas")
+//    public ResponseEntity<?> crearCita(@RequestBody CrearCitaRequestDto citaRequestDto) {
+//        if (citaRequestDto == null || citaRequestDto.getPacienteId() == null ||
+//                citaRequestDto.getMedicoId() == null || citaRequestDto.getFecha() == null) {
+//            return ResponseEntity.badRequest().body("Paciente ID, Médico ID y Fecha/Hora son obligatorios para crear una cita.");
 //        }
-
-        Integer nuevaCitaId = db.crearCita(citaRequestDto);
-
-        if (nuevaCitaId != null) {
-            CitaDto nuevaCita = db.obtenerCitaPorId(nuevaCitaId); // Fetch the full CitaDto
-            if (nuevaCita != null) {
-                // Populate additional details for the response
-                populateCitaDtoDetails(nuevaCita, db);
-                return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCita);
-            }
-            // Fallback if fetching fails, though ideally it shouldn't
-            return ResponseEntity.status(HttpStatus.CREATED).body("Cita creada con ID: " + nuevaCitaId + ". No se pudieron obtener todos los detalles.");
-        } else {
-            // This could be due to FK violation if IDs were checked but deleted just before, or other DB errors
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la cita. Verifique que el Paciente y Médico existan.");
-        }
-    }
+//
+//        ConnectionUtil db = new ConnectionUtil();
+//
+//        // Validate Paciente existence
+//        if (db.obtenerPacientePorId_new(citaRequestDto.getPacienteId()) == null) {
+//            return ResponseEntity.badRequest().body("Error: El paciente con ID " + citaRequestDto.getPacienteId() + " no existe.");
+//        }
+//        // Validate Medico existence
+////        if (db.obtenerMedicoPorId(citaRequestDto.getMedicoId()) == null) {
+////            return ResponseEntity.badRequest().body("Error: El médico con ID " + citaRequestDto.getMedicoId() + " no existe.");
+////        }
+//
+//        Integer nuevaCitaId = db.crearCita(citaRequestDto);
+//
+//        if (nuevaCitaId != null) {
+//            CitaDto nuevaCita = db.obtenerCitaPorId(nuevaCitaId); // Fetch the full CitaDto
+//            if (nuevaCita != null) {
+//                // Populate additional details for the response
+//                populateCitaDtoDetails(nuevaCita, db);
+//                return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCita);
+//            }
+//            // Fallback if fetching fails, though ideally it shouldn't
+//            return ResponseEntity.status(HttpStatus.CREATED).body("Cita creada con ID: " + nuevaCitaId + ". No se pudieron obtener todos los detalles.");
+//        } else {
+//            // This could be due to FK violation if IDs were checked but deleted just before, or other DB errors
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la cita. Verifique que el Paciente y Médico existan.");
+//        }
+//    }
 
 
 
@@ -547,72 +547,72 @@ public class CitaMedicaController {
     }
 
     // Helper method to populate CitaDto with details from related entities
-    private void populateCitaDtoDetails(CitaDto cita, ConnectionUtil db) {
-        if (cita == null) return;
-
-        if (cita.getPacienteId() != null) {
-            PacienteDto paciente = db.obtenerPacientePorId_new(cita.getPacienteId());
-            if (paciente != null) {
-                cita.setPacienteNombreCompleto(paciente.getNombre() + " " + paciente.getApellido());
-            }
-        }
-
-        if (cita.getMedicoId() != null) {
-            MedicosDto medico = db.obtenerMedicoPorId_new(cita.getMedicoId());
-            if (medico != null) {
-                cita.setMedicoNombreCompleto(medico.getNombre() + " " + medico.getApellido());
-                if (medico.getEspecialidadId() != null) {
-                    EspecialidadDto especialidad = db.obtenerEspecialidadPorId_new(medico.getEspecialidadId());
-                    if (especialidad != null) {
-                        cita.setMedicoEspecialidad(especialidad.getNombre());
-                    }
-                }
-            }
-        }
-    }
-
-
-
-    @PostMapping("/historias")
-    public ResponseEntity<?> crearHistoriaMedica(@RequestBody CrearHistoriaMedicaRequestDto requestDto) {
-        if (requestDto == null || requestDto.getPacienteId() == null || requestDto.getMedicoId() == null) {
-            return ResponseEntity.badRequest().body("Paciente ID y Médico ID son obligatorios para crear una historia médica.");
-        }
-
-        ConnectionUtil db = new ConnectionUtil();
-
-        // Optional: Validate Paciente and Medico existence if not handled by DB foreign keys or if a clearer error is desired
-        if (db.obtenerPacientePorId(requestDto.getPacienteId()) == null) {
-            return ResponseEntity.badRequest().body("Error: El paciente con ID " + requestDto.getPacienteId() + " no existe.");
-        }
-        if (db.obtenerMedicoPorId(requestDto.getMedicoId()) == null) {
-            return ResponseEntity.badRequest().body("Error: El médico con ID " + requestDto.getMedicoId() + " no existe.");
-        }
-        // Optional: Validate Cita existence if citaId is provided and must be valid
-        if (requestDto.getCitaId() != null && db.obtenerCitaPorId(requestDto.getCitaId()) == null) {
-            return ResponseEntity.badRequest().body("Error: La cita con ID " + requestDto.getCitaId() + " no existe.");
-        }
+//    private void populateCitaDtoDetails(CitaDto cita, ConnectionUtil db) {
+//        if (cita == null) return;
+//
+//        if (cita.getPacienteId() != null) {
+//            PacienteDto paciente = db.obtenerPacientePorId_new(cita.getPacienteId());
+//            if (paciente != null) {
+//                cita.setPacienteNombreCompleto(paciente.getNombre() + " " + paciente.getApellido());
+//            }
+//        }
+//
+//        if (cita.getMedicoId() != null) {
+//            MedicosDto medico = db.obtenerMedicoPorId_new(cita.getMedicoId());
+//            if (medico != null) {
+//                cita.setMedicoNombreCompleto(medico.getNombre() + " " + medico.getApellido());
+//                if (medico.getEspecialidadId() != null) {
+//                    EspecialidadDto especialidad = db.obtenerEspecialidadPorId_new(medico.getEspecialidadId());
+//                    if (especialidad != null) {
+//                        cita.setMedicoEspecialidad(especialidad.getNombre());
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
-        try {
-            Integer nuevaHistoriaId = db.crearHistoriaMedica(requestDto);
-            if (nuevaHistoriaId != null) {
-                HistoriaMedicaDto historiaMedica = db.obtenerHistoriaMedicaPorId(nuevaHistoriaId);
-                if (historiaMedica != null) {
-                    // populateHistoriaMedicaDtoDetails(historiaMedica, db); // If needed later
-                    return ResponseEntity.status(HttpStatus.CREATED).body(historiaMedica);
-                } else {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Historia médica creada pero no se pudo recuperar el registro completo. ID: " + nuevaHistoriaId);
-                }
-            } else {
-                // This could be due to FK violation if IDs were checked but deleted just before, or other DB errors
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la historia médica. Verifique los datos proporcionados (IDs de paciente, médico, cita).");
-            }
-        } catch (Exception e) {
-            // Log exception e
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor al crear la historia médica: " + e.getMessage());
-        }
-    }
+
+//    @PostMapping("/historias")
+//    public ResponseEntity<?> crearHistoriaMedica(@RequestBody CrearHistoriaMedicaRequestDto requestDto) {
+//        if (requestDto == null || requestDto.getPacienteId() == null || requestDto.getMedicoId() == null) {
+//            return ResponseEntity.badRequest().body("Paciente ID y Médico ID son obligatorios para crear una historia médica.");
+//        }
+//
+//        ConnectionUtil db = new ConnectionUtil();
+//
+//        // Optional: Validate Paciente and Medico existence if not handled by DB foreign keys or if a clearer error is desired
+//        if (db.obtenerPacientePorId(requestDto.getPacienteId()) == null) {
+//            return ResponseEntity.badRequest().body("Error: El paciente con ID " + requestDto.getPacienteId() + " no existe.");
+//        }
+//        if (db.obtenerMedicoPorId(requestDto.getMedicoId()) == null) {
+//            return ResponseEntity.badRequest().body("Error: El médico con ID " + requestDto.getMedicoId() + " no existe.");
+//        }
+//        // Optional: Validate Cita existence if citaId is provided and must be valid
+//        if (requestDto.getCitaId() != null && db.obtenerCitaPorId(requestDto.getCitaId()) == null) {
+//            return ResponseEntity.badRequest().body("Error: La cita con ID " + requestDto.getCitaId() + " no existe.");
+//        }
+//
+//
+//        try {
+//            Integer nuevaHistoriaId = db.crearHistoriaMedica(requestDto);
+//            if (nuevaHistoriaId != null) {
+//                HistoriaMedicaDto historiaMedica = db.obtenerHistoriaMedicaPorId(nuevaHistoriaId);
+//                if (historiaMedica != null) {
+//                    // populateHistoriaMedicaDtoDetails(historiaMedica, db); // If needed later
+//                    return ResponseEntity.status(HttpStatus.CREATED).body(historiaMedica);
+//                } else {
+//                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Historia médica creada pero no se pudo recuperar el registro completo. ID: " + nuevaHistoriaId);
+//                }
+//            } else {
+//                // This could be due to FK violation if IDs were checked but deleted just before, or other DB errors
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la historia médica. Verifique los datos proporcionados (IDs de paciente, médico, cita).");
+//            }
+//        } catch (Exception e) {
+//            // Log exception e
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor al crear la historia médica: " + e.getMessage());
+//        }
+//    }
 
 
     @PostMapping("/consulta-programacion")
@@ -744,11 +744,24 @@ public class CitaMedicaController {
 
         List<ConsultaMedicosDto> solicitudes = new ArrayList<ConsultaMedicosDto>();
         ConnectionUtil db = new ConnectionUtil();
-        solicitudes = db.obtenerMedicoActual(entrada.getMedicoId(),
-                entrada.getIdclinica());
+        solicitudes = db.obtenerMedicoActual(entrada.getMedicoId());
 
 
         return solicitudes;
+    }
+
+    @PostMapping("/crear-medicos")
+    public ClaveDto crearmedicoa(@RequestBody MedicosDto medRequestDto) {
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        ClaveDto solicitudes = new ClaveDto();
+
+        solicitudes = db.creanuevomedico(medRequestDto);
+
+        return solicitudes;
+
+
     }
 
 

@@ -19,6 +19,8 @@ public class MedicosDto {
     private String  correoElectronico;
     private Date fechaRegistro;
     private String  estatus;
+    private Integer  idestatus;
     private String  idclinica;
+    private String  usuario;
 
 }

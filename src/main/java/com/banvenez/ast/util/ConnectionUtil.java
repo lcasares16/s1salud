@@ -8231,7 +8231,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
 
 
-    public List<ConsultaMedicosDto> obtenerMedicoActual(Integer medicoId, String clinica) {
+    public List<ConsultaMedicosDto> obtenerMedicoActual(Integer medicoId ) {
         Connection conn = null;
         ConexionDto conexion = new ConexionDto();
         List<ConsultaMedicosDto> citas = new ArrayList<>();
@@ -8254,11 +8254,11 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 } else {
                     stmt.setNull(2, Types.INTEGER);
                 }
-                if (clinica != null) {
-                    stmt.setString(3, clinica);
-                } else {
-                    stmt.setNull(3, Types.VARCHAR);
-                }
+//                if (clinica != null) {
+//                    stmt.setString(3, clinica);
+//                } else {
+//                    stmt.setNull(3, Types.VARCHAR);
+//                }
 
                 stmt.execute();
 
@@ -8562,170 +8562,170 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         return medicos;
     }
 
-    public MedicosDto obtenerMedicoPorId(Integer medicoId) {
-        Connection conn = null;
-        ConexionDto conexion = new ConexionDto();
-        MedicosDto medico = null;
-        CallableStatement stmt = null;
-        ResultSet rs = null;
-
-        if (medicoId == null) return null;
-
-        try {
-            Class.forName(conexion.getDrivers());
-            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
-            stmt = conn.prepareCall("{? = call citas_medicas.obtener_medico_por_id(?)}");
-            stmt.registerOutParameter(1, Types.OTHER);
-            stmt.setInt(2, medicoId);
-            stmt.execute();
-            rs = (ResultSet) stmt.getObject(1);
-
-            if (rs.next()) {
-                medico = new MedicosDto();
-                medico.setMedicoId(rs.getInt("medico_id"));
-                medico.setCedula(rs.getString("cedula"));
-                medico.setNombre(rs.getString("nombre"));
-                medico.setApellido(rs.getString("apellido"));
-                medico.setEspecialidadId(rs.getInt("especialidad_id"));
-                if (rs.wasNull()) {
-                    medico.setEspecialidadId(null);
-                }
-                medico.setTelefono(rs.getString("telefono"));
-                medico.setCorreoElectronico(rs.getString("correo_electronico"));
-                medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
-                // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
-                System.out.println("obtenerMedicoPorId: Found medico with ID " + medicoId);
-            } else {
-                System.out.println("obtenerMedicoPorId: No medico found with ID " + medicoId);
-            }
-        } catch (Exception e) {
-            System.err.println("Error en obtenerMedicoPorId: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                System.err.println("Error cerrando recursos en obtenerMedicoPorId: " + e.getMessage());
-            }
-        }
-        return medico;
-    }
-
-
-    public MedicosDto  obtenerMedicoPorId_new(Integer medicoId) {
-
-        Connection conn = null;
-        ConexionDto conexion = new ConexionDto();
-        PacienteDto paciente = null;
-        MedicosDto medico = null;
-        ResultSet rs = null;
-        List<ProductoDto> resp =   new ArrayList<>();
-
-        try {
-            Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
-            conn.setAutoCommit(false);
-            if (conn != null) {
+//    public MedicosDto obtenerMedicoPorId(Integer medicoId) {
+//        Connection conn = null;
+//        ConexionDto conexion = new ConexionDto();
+//        MedicosDto medico = null;
+//        CallableStatement stmt = null;
+//        ResultSet rs = null;
+//
+//        if (medicoId == null) return null;
+//
+//        try {
+//            Class.forName(conexion.getDrivers());
+//            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+//            stmt = conn.prepareCall("{? = call citas_medicas.obtener_medico_por_id(?)}");
+//            stmt.registerOutParameter(1, Types.OTHER);
+//            stmt.setInt(2, medicoId);
+//            stmt.execute();
+//            rs = (ResultSet) stmt.getObject(1);
+//
+//            if (rs.next()) {
+//                medico = new MedicosDto();
+//                medico.setMedicoId(rs.getInt("medico_id"));
+//                medico.setCedula(rs.getString("cedula"));
+//                medico.setNombre(rs.getString("nombre"));
+//                medico.setApellido(rs.getString("apellido"));
+//                medico.setEspecialidadId(rs.getInt("especialidad_id"));
+//                if (rs.wasNull()) {
+//                    medico.setEspecialidadId(null);
+//                }
+//                medico.setTelefono(rs.getString("telefono"));
+//                medico.setCorreoElectronico(rs.getString("correo_electronico"));
+//                medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+//                // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
+//                System.out.println("obtenerMedicoPorId: Found medico with ID " + medicoId);
+//            } else {
+//                System.out.println("obtenerMedicoPorId: No medico found with ID " + medicoId);
+//            }
+//        } catch (Exception e) {
+//            System.err.println("Error en obtenerMedicoPorId: " + e.getMessage());
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if (rs != null) rs.close();
+//                if (stmt != null) stmt.close();
+//                if (conn != null) conn.close();
+//            } catch (SQLException e) {
+//                System.err.println("Error cerrando recursos en obtenerMedicoPorId: " + e.getMessage());
+//            }
+//        }
+//        return medico;
+//    }
 
 
+//    public MedicosDto  obtenerMedicoPorId_new(Integer medicoId) {
+//
+//        Connection conn = null;
+//        ConexionDto conexion = new ConexionDto();
+//        PacienteDto paciente = null;
+//        MedicosDto medico = null;
+//        ResultSet rs = null;
+//        List<ProductoDto> resp =   new ArrayList<>();
+//
+//        try {
+//            Class.forName("org.postgresql.Driver");
+//            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+//            conn.setAutoCommit(false);
+//            if (conn != null) {
+//
+//
+//
+//                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medico_por_id(?)}");
+//                stmt.registerOutParameter(1, Types.OTHER);
+//                stmt.setInt(2, medicoId);
+//                stmt.execute();
+//
+//                //ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+//                rs = (ResultSet) stmt.getObject(1);
+//                if (rs.next()) {
+//                    medico = new MedicosDto();
+//                    medico.setMedicoId(rs.getInt("medico_id"));
+//                    medico.setCedula(rs.getString("cedula"));
+//                    medico.setNombre(rs.getString("nombre"));
+//                    medico.setApellido(rs.getString("apellido"));
+//                    medico.setEspecialidadId(rs.getInt("especialidad_id"));
+//                    if (rs.wasNull()) {
+//                        medico.setEspecialidadId(null);
+//                    }
+//                    medico.setTelefono(rs.getString("telefono"));
+//                    medico.setCorreoElectronico(rs.getString("correo_electronico"));
+//                    medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+//                    // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
+//                    System.out.println("obtenerMedicoPorId: Found medico with ID " + medicoId);
+//                } else {
+//                    System.out.println("obtenerMedicoPorId: No medico found with ID " + medicoId);
+//                }
+//
+//
+//                rs.close();
+//                stmt.close();
+//                conn.close();
+//
+//
+//                System.out.println("Connection Exitosa");
+//            } else {
+//                System.out.println("Connection Fallida");
+//            }
+//
+//        } catch (Exception e) {
+//            System.out.println(e);
+//        }
+//
+//        return medico;
+//
+//    }
 
-                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medico_por_id(?)}");
-                stmt.registerOutParameter(1, Types.OTHER);
-                stmt.setInt(2, medicoId);
-                stmt.execute();
 
-                //ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
-                rs = (ResultSet) stmt.getObject(1);
-                if (rs.next()) {
-                    medico = new MedicosDto();
-                    medico.setMedicoId(rs.getInt("medico_id"));
-                    medico.setCedula(rs.getString("cedula"));
-                    medico.setNombre(rs.getString("nombre"));
-                    medico.setApellido(rs.getString("apellido"));
-                    medico.setEspecialidadId(rs.getInt("especialidad_id"));
-                    if (rs.wasNull()) {
-                        medico.setEspecialidadId(null);
-                    }
-                    medico.setTelefono(rs.getString("telefono"));
-                    medico.setCorreoElectronico(rs.getString("correo_electronico"));
-                    medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
-                    // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
-                    System.out.println("obtenerMedicoPorId: Found medico with ID " + medicoId);
-                } else {
-                    System.out.println("obtenerMedicoPorId: No medico found with ID " + medicoId);
-                }
-
-
-                rs.close();
-                stmt.close();
-                conn.close();
-
-
-                System.out.println("Connection Exitosa");
-            } else {
-                System.out.println("Connection Fallida");
-            }
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
-        return medico;
-
-    }
-
-
-    public List<MedicosDto> obtenerMedicosPorEspecialidad(Integer especialidadId) {
-        Connection conn = null;
-        ConexionDto conexion = new ConexionDto();
-        List<MedicosDto> medicos = new ArrayList<>();
-        CallableStatement stmt = null;
-        ResultSet rs = null;
-
-        if (especialidadId == null) return medicos; // Return empty list
-
-        try {
-            Class.forName(conexion.getDrivers());
-            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
-            stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos_por_especialidad(?)}");
-            stmt.registerOutParameter(1, Types.OTHER);
-            stmt.setInt(2, especialidadId);
-            stmt.execute();
-            rs = (ResultSet) stmt.getObject(1);
-
-            while (rs.next()) {
-                MedicosDto medico = new MedicosDto();
-                medico.setMedicoId(rs.getInt("medico_id"));
-                medico.setCedula(rs.getString("cedula"));
-                medico.setNombre(rs.getString("nombre"));
-                medico.setApellido(rs.getString("apellido"));
-                medico.setEspecialidadId(rs.getInt("especialidad_id"));
-                if (rs.wasNull()) {
-                    medico.setEspecialidadId(null);
-                }
-                medico.setTelefono(rs.getString("telefono"));
-                medico.setCorreoElectronico(rs.getString("correo_electronico"));
-                medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
-                // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
-                medicos.add(medico);
-            }
-            System.out.println("obtenerMedicosPorEspecialidad: Fetched " + medicos.size() + " records for especialidad ID " + especialidadId);
-        } catch (Exception e) {
-            System.err.println("Error en obtenerMedicosPorEspecialidad: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                System.err.println("Error cerrando recursos en obtenerMedicosPorEspecialidad: " + e.getMessage());
-            }
-        }
-        return medicos;
-    }
+//    public List<MedicosDto> obtenerMedicosPorEspecialidad(Integer especialidadId) {
+//        Connection conn = null;
+//        ConexionDto conexion = new ConexionDto();
+//        List<MedicosDto> medicos = new ArrayList<>();
+//        CallableStatement stmt = null;
+//        ResultSet rs = null;
+//
+//        if (especialidadId == null) return medicos; // Return empty list
+//
+//        try {
+//            Class.forName(conexion.getDrivers());
+//            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+//            stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos_por_especialidad(?)}");
+//            stmt.registerOutParameter(1, Types.OTHER);
+//            stmt.setInt(2, especialidadId);
+//            stmt.execute();
+//            rs = (ResultSet) stmt.getObject(1);
+//
+//            while (rs.next()) {
+//                MedicosDto medico = new MedicosDto();
+//                medico.setMedicoId(rs.getInt("medico_id"));
+//                medico.setCedula(rs.getString("cedula"));
+//                medico.setNombre(rs.getString("nombre"));
+//                medico.setApellido(rs.getString("apellido"));
+//                medico.setEspecialidadId(rs.getInt("especialidad_id"));
+//                if (rs.wasNull()) {
+//                    medico.setEspecialidadId(null);
+//                }
+//                medico.setTelefono(rs.getString("telefono"));
+//                medico.setCorreoElectronico(rs.getString("correo_electronico"));
+//                medico.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+//                // medico.setNombreEspecialidad() would require a JOIN in SP or separate call
+//                medicos.add(medico);
+//            }
+//            System.out.println("obtenerMedicosPorEspecialidad: Fetched " + medicos.size() + " records for especialidad ID " + especialidadId);
+//        } catch (Exception e) {
+//            System.err.println("Error en obtenerMedicosPorEspecialidad: " + e.getMessage());
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if (rs != null) rs.close();
+//                if (stmt != null) stmt.close();
+//                if (conn != null) conn.close();
+//            } catch (SQLException e) {
+//                System.err.println("Error cerrando recursos en obtenerMedicosPorEspecialidad: " + e.getMessage());
+//            }
+//        }
+//        return medicos;
+//    }
 
     public String actualizarMedico(MedicosDto medico) {
         Connection conn = null;
@@ -10931,5 +10931,63 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
         return resp;
     }
+
+    public ClaveDto creanuevomedico(MedicosDto citaRequest) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        ClaveDto resp =   new ClaveDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.crear_medico(?, ?, ?, ?, ?, ?,?,?,?)}");
+                stmt.registerOutParameter(1, Types.INTEGER); // Set the output parameter type
+                stmt.setString(2, citaRequest.getCedula());
+                stmt.setString(3, citaRequest.getNombre());
+                stmt.setString(4, citaRequest.getApellido());
+                stmt.setInt(5, citaRequest.getEspecialidadId());
+                stmt.setString(6, citaRequest.getTelefono());
+                stmt.setString(7, citaRequest.getCorreoElectronico());
+                stmt.setInt(8, citaRequest.getIdestatus());
+                stmt.setString(9, citaRequest.getIdclinica());
+                stmt.setString(10, citaRequest.getUsuario());
+
+
+
+
+                stmt.execute();
+                Integer resultado = stmt.getInt(1);
+                ClaveDto sol = new ClaveDto();
+                sol.setClave(resultado);
+                // resp.((resultado));
+                resp.setClave((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
 
 }
