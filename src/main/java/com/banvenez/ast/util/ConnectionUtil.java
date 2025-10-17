@@ -8247,7 +8247,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
             conn.setAutoCommit(false);
 
             if (conn != null) {
-                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos(?,?)}");
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos(?)}");
                 stmt.registerOutParameter(1, Types.OTHER);
                 if (medicoId != null) {
                     stmt.setInt(2, medicoId);
@@ -8277,7 +8277,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                     sol.setNombreEspecialidad(rs.getString("nombreEspecialidad"));
                     sol.setTelefono(rs.getString("telefono"));
                     sol.setCorreoElectronico(rs.getString("correo_electronico"));
-                    sol.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                    sol.setFechareg(rs.getString("fecha_registro"));
                     sol.setId_estatus(rs.getString("id_estatus"));
                     sol.setEstatus(rs.getString("estatus"));
                     sol.setIdclinica(rs.getString("id_clinica"));
@@ -8305,6 +8305,141 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         return resp;
     }
 
+
+    public List<ConsultaGenClinicaDto> obtenerClinicaActual(String nombre ) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<ConsultaGenClinicaDto> citas = new ArrayList<>();
+        List<ConsultaGenClinicaDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(
+                    conexion.getUrl() + conexion.getDbname(),
+                    conexion.getUser(),
+                    conexion.getPass()
+            );
+            conn.setAutoCommit(false);
+
+            if (conn != null) {
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.consulta_clinicas_general(?)}");
+                stmt.registerOutParameter(1, Types.OTHER);
+                if (nombre != null) {
+                    stmt.setString(2, nombre);
+                } else {
+                    stmt.setNull(2, Types.VARCHAR);
+                }
+//                if (clinica != null) {
+//                    stmt.setString(3, clinica);
+//                } else {
+//                    stmt.setNull(3, Types.VARCHAR);
+//                }
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1);
+
+                while (rs.next()) {
+
+
+                    ConsultaGenClinicaDto sol = new ConsultaGenClinicaDto();
+
+                    sol.setCodigo(rs.getString("codigo"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setFechacreacion(rs.getString("fecha_creacion"));
+                    sol.setDireccion(rs.getString("direccion"));
+                    sol.setRif(rs.getString("rif"));
+                    sol.setIdestatus(rs.getString("id_estatus"));
+                    sol.setEstatus(rs.getString("estatus"));
+                    sol.setTelefono(rs.getString("telefono"));
+
+
+
+
+                    resp.add(sol);
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+    public List<EspecialidadDto> obtenerespecialidadActual(Integer especialidad ) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<EspecialidadDto> citas = new ArrayList<>();
+        List<EspecialidadDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(
+                    conexion.getUrl() + conexion.getDbname(),
+                    conexion.getUser(),
+                    conexion.getPass()
+            );
+            conn.setAutoCommit(false);
+
+            if (conn != null) {
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_especialidad_por_id(?)}");
+                stmt.registerOutParameter(1, Types.OTHER);
+                if (especialidad != null) {
+                    stmt.setInt(2, especialidad);
+                } else {
+                    stmt.setNull(2, Types.INTEGER);
+                }
+//                if (clinica != null) {
+//                    stmt.setString(3, clinica);
+//                } else {
+//                    stmt.setNull(3, Types.VARCHAR);
+//                }
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1);
+
+                while (rs.next()) {
+
+
+                    EspecialidadDto sol = new EspecialidadDto();
+
+                    sol.setEspecialidadId(rs.getInt("especialidad_id"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setDescripcion(rs.getString("descripcion"));
+                    sol.setPrecio(rs.getDouble("precio"));
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
 
 
 
@@ -10958,6 +11093,116 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 stmt.setInt(8, citaRequest.getIdestatus());
                 stmt.setString(9, citaRequest.getIdclinica());
                 stmt.setString(10, citaRequest.getUsuario());
+
+
+
+
+                stmt.execute();
+                Integer resultado = stmt.getInt(1);
+                ClaveDto sol = new ClaveDto();
+                sol.setClave(resultado);
+                // resp.((resultado));
+                resp.setClave((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public ClaveDto crearclinicaactual(ConsultaGenClinicaDto citaRequest) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        ClaveDto resp =   new ClaveDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.crear_clinica(?, ?, ?, ?, ?)}");
+                stmt.registerOutParameter(1, Types.INTEGER); // Set the output parameter type
+                stmt.setString(2, citaRequest.getNombre());
+                stmt.setString(3, citaRequest.getDireccion());
+                stmt.setString(4, citaRequest.getRif());
+                stmt.setString(5, citaRequest.getEstatus());
+                stmt.setString(6, citaRequest.getTelefono());
+
+
+
+
+
+                stmt.execute();
+                Integer resultado = stmt.getInt(1);
+                ClaveDto sol = new ClaveDto();
+                sol.setClave(resultado);
+                // resp.((resultado));
+                resp.setClave((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public ClaveDto crearespecialidactual(EspecialidadDto citaRequest) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        ClaveDto resp =   new ClaveDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.crear_especialidad(?, ?, ?, ?)}");
+                stmt.registerOutParameter(1, Types.INTEGER); // Set the output parameter type
+                stmt.setString(2, citaRequest.getNombre());
+                stmt.setString(3, citaRequest.getDescripcion());
+                stmt.setDouble(4, citaRequest.getPrecio());
+                stmt.setString(5, citaRequest.getUsuario());
+
+
 
 
 

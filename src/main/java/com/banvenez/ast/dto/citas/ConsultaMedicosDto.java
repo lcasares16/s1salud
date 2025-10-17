@@ -21,5 +21,6 @@ public class ConsultaMedicosDto {
     private String  estatus;
     private String  idclinica;
     private String  nombreclinica;
+    private String    fechareg;
 
 }

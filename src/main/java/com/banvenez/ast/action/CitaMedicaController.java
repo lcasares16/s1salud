@@ -739,7 +739,7 @@ public class CitaMedicaController {
 
     }
 
-    @PostMapping("/consulta-medicos_actual")
+    @PostMapping("/consulta-medicos-actual")
     public List<ConsultaMedicosDto> consultamedicosactula(@RequestBody MedicosDto entrada){
 
         List<ConsultaMedicosDto> solicitudes = new ArrayList<ConsultaMedicosDto>();
@@ -764,5 +764,56 @@ public class CitaMedicaController {
 
     }
 
+    @PostMapping("/consulta-clinica-actual")
+    public List<ConsultaGenClinicaDto> consultaclinicasactula(@RequestBody ConsultaGenClinicaDto entrada){
+
+        List<ConsultaGenClinicaDto> solicitudes = new ArrayList<ConsultaGenClinicaDto>();
+        ConnectionUtil db = new ConnectionUtil();
+        solicitudes = db.obtenerClinicaActual(entrada.getNombre());
+
+
+        return solicitudes;
+    }
+
+
+    @PostMapping("/crear-clinicas")
+    public ClaveDto crearclinicaactual(@RequestBody ConsultaGenClinicaDto medRequestDto) {
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        ClaveDto solicitudes = new ClaveDto();
+
+        solicitudes = db.crearclinicaactual(medRequestDto);
+
+        return solicitudes;
+
+
+    }
+
+    @PostMapping("/consulta-especialidad-actual")
+    public List<EspecialidadDto> consultaespecialidadactula(@RequestBody EspecialidadDto entrada){
+
+        List<EspecialidadDto> solicitudes = new ArrayList<EspecialidadDto>();
+        ConnectionUtil db = new ConnectionUtil();
+        solicitudes = db.obtenerespecialidadActual(entrada.getEspecialidadId());
+
+
+        return solicitudes;
+    }
+
+
+    @PostMapping("/crear-especialidades")
+    public ClaveDto crearespecialidadesctual(@RequestBody EspecialidadDto medRequestDto) {
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        ClaveDto solicitudes = new ClaveDto();
+
+        solicitudes = db.crearespecialidactual(medRequestDto);
+
+        return solicitudes;
+
+
+    }
 
 }

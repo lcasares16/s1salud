@@ -12,5 +12,7 @@ public class EspecialidadDto {
     private Integer especialidadId;
     private String nombre;
     private String descripcion;
+    private double precio;
+    private String usuario;
 
 }
