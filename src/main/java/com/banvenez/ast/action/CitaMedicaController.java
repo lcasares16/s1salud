@@ -816,4 +816,20 @@ public class CitaMedicaController {
 
     }
 
+    @PostMapping("/estatus-clinica")
+    public List<Estados> Listaclinicas(){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+
+        List<Estados> solicitudes = new ArrayList<Estados>();
+        solicitudes = db.Estatusclinicas();
+
+
+        return solicitudes;
+
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
 }
