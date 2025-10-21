@@ -831,5 +831,18 @@ public class CitaMedicaController {
         //return new ResponseEntity<>(list, HttpStatus.OK);
 
     }
+    @PostMapping("/actualiza-clinica")
+    public RespuestaCitasDto ActualizaClinica(@RequestBody ConsultaGenClinicaDto citaRequestDto) {
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        RespuestaCitasDto solicitudes = new RespuestaCitasDto();
+
+        solicitudes = db.actualizaClinicas(citaRequestDto);
+
+        return solicitudes;
+
+
+    }
 
 }

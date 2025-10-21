@@ -8247,7 +8247,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
             conn.setAutoCommit(false);
 
             if (conn != null) {
-                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos(?)}");
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.obtener_medicos_bk(?)}");
                 stmt.registerOutParameter(1, Types.OTHER);
                 if (medicoId != null) {
                     stmt.setInt(2, medicoId);
@@ -9031,7 +9031,59 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         return resp;
     }
 
+    public RespuestaCitasDto actualizaClinicas(ConsultaGenClinicaDto citaRequest) {
 
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        RespuestaCitasDto resp =   new RespuestaCitasDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.actualiza_clinica(?, ?, ?, ?, ?, ?, ?)}");
+                stmt.registerOutParameter(1, Types.VARCHAR); // Set the output parameter type
+                stmt.setString(2, citaRequest.getCodigo());
+                stmt.setString(3, citaRequest.getNombre());
+                stmt.setString(4, citaRequest.getDireccion());
+                stmt.setString(5, citaRequest.getRif());
+                stmt.setString(6, citaRequest.getStatus());
+                stmt.setString(7, citaRequest.getTelefono());
+                stmt.setString(8, citaRequest.getUsuario());
+
+
+
+                stmt.execute();
+                String resultado = stmt.getString(1);
+                RespuestaCitasDto sol = new RespuestaCitasDto();
+                sol.setRespuesta(resultado);
+                // resp.((resultado));
+                resp.setRespuesta((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
 
 
     // --- Métodos para Citas ---
@@ -11200,7 +11252,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 stmt.setString(2, citaRequest.getNombre());
                 stmt.setString(3, citaRequest.getDireccion());
                 stmt.setString(4, citaRequest.getRif());
-                stmt.setString(5, citaRequest.getEstatus());
+                stmt.setString(5, citaRequest.getStatus());
                 stmt.setString(6, citaRequest.getTelefono());
 
 

@@ -14,4 +14,6 @@ public class ConsultaGenClinicaDto {
     private String idestatus;
     private String estatus;
     private String telefono;
+    private String status;
+    private String usuario;
 }
