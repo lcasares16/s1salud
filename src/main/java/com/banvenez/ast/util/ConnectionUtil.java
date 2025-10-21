@@ -9086,6 +9086,64 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
     }
 
 
+    public RespuestaCitasDto actualizaMedico(MedicosDto citaRequest) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        RespuestaCitasDto resp =   new RespuestaCitasDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.actualizar_medico(?, ?, ?, ?, ?, ?, ?,?,?,?)}");
+                stmt.registerOutParameter(1, Types.VARCHAR); // Set the output parameter type
+                stmt.setInt(2, citaRequest.getMedicoId());
+                stmt.setString(3, citaRequest.getCedula());
+                stmt.setString(4, citaRequest.getNombre());
+                stmt.setString(5, citaRequest.getApellido());
+                stmt.setInt(6, citaRequest.getEspecialidadId());
+                stmt.setString(7, citaRequest.getTelefono());
+                stmt.setString(8, citaRequest.getCorreoElectronico());
+                stmt.setString(9, citaRequest.getEstatus());
+                stmt.setString(10, citaRequest.getIdclinica());
+                stmt.setString(11, citaRequest.getUsuario());
+
+
+
+                stmt.execute();
+                String resultado = stmt.getString(1);
+                RespuestaCitasDto sol = new RespuestaCitasDto();
+                sol.setRespuesta(resultado);
+                // resp.((resultado));
+                resp.setRespuesta((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
     // --- Métodos para Citas ---
 
     public Integer crearCita(CrearCitaRequestDto citaRequest) {
@@ -11136,6 +11194,110 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
 
                 CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.consulta_estatus_clinicas()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+                    Estados sol = new Estados();
+
+                    sol.setCodigo(rs.getString("codigo"));
+                    sol.setNombre(rs.getString("nombre"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<Estados> Estatusmedico() {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<Estados> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.consulta_estatus_medicos()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+                    Estados sol = new Estados();
+
+                    sol.setCodigo(rs.getString("codigo"));
+                    sol.setNombre(rs.getString("nombre"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<Estados> ConsultaEspecialidad() {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<Estados> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.consulta_especialidades()}");
                 stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
 
                 stmt.execute();

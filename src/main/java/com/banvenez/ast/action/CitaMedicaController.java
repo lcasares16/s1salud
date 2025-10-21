@@ -845,4 +845,52 @@ public class CitaMedicaController {
 
     }
 
+    @PostMapping("/estatus-medico")
+    public List<Estados> Listamedicos(){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+
+        List<Estados> solicitudes = new ArrayList<Estados>();
+        solicitudes = db.Estatusmedico();
+
+
+        return solicitudes;
+
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+
+    @PostMapping("/consulta-especialidad")
+    public List<Estados> Listaespecialidad(){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+
+        List<Estados> solicitudes = new ArrayList<Estados>();
+        solicitudes = db.ConsultaEspecialidad();
+
+
+        return solicitudes;
+
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+
+    @PostMapping("/actualiza-medico")
+    public RespuestaCitasDto Actualizamedico(@RequestBody MedicosDto citaRequestDto) {
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        RespuestaCitasDto solicitudes = new RespuestaCitasDto();
+
+        solicitudes = db.actualizaMedico(citaRequestDto);
+
+        return solicitudes;
+
+
+    }
+
 }
