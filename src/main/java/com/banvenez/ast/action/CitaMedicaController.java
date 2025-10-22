@@ -893,4 +893,20 @@ public class CitaMedicaController {
 
     }
 
+
+    @PostMapping("/actualiza-especialidad")
+    public RespuestaCitasDto ActualizaEspecialidad(@RequestBody EspecialidadDto citaRequestDto) {
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        RespuestaCitasDto solicitudes = new RespuestaCitasDto();
+
+        solicitudes = db.actualizaEspecialidad(citaRequestDto);
+
+        return solicitudes;
+
+
+    }
+
+
 }

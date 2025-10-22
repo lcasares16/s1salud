@@ -22,5 +22,6 @@ public class MedicosDto {
     private Integer  idestatus;
     private String  idclinica;
     private String  usuario;
+    private String  status;
 
 }
