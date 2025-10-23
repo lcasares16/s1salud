@@ -1,12 +1,10 @@
 package com.banvenez.ast.action;
 
 
-import com.banvenez.ast.dto.RecibirRespDto;
 import com.banvenez.ast.dto.administracion.ConvierteTasaDto;
 import com.banvenez.ast.dto.administracion.ProcesoTasaDto;
-import com.banvenez.ast.dto.administracion.TipoMonedaDto;
+import com.banvenez.ast.dto.administracion.SalidaRefeFechaDto;
 import com.banvenez.ast.dto.farmacia.*;
-import com.banvenez.ast.dto.reportes.SalidaRepDto;
 import com.banvenez.ast.util.ConnectionUtil;
 import org.springframework.web.bind.annotation.*;
 
@@ -372,6 +370,30 @@ public class FarmaciaController {
         List<RegistrarClientes> solicitudes = new ArrayList<RegistrarClientes>();
         solicitudes = db.consultar_cliente(registro
         );
+
+        return solicitudes;
+    }
+
+
+    @PostMapping("/reporte-inventario")
+    public  List<RepInventarioDto> reporteinventario(@RequestBody SalidaRefeFechaDto registro){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        List<RepInventarioDto> solicitudes = new ArrayList<RepInventarioDto>();
+        solicitudes = db.Reporte_inventario(registro);
+
+        return solicitudes;
+    }
+
+
+    @PostMapping("/reporte-ganancia")
+    public  List<GanaciasDiariasDto> actualizaganancia(@RequestBody SalidaRefeFechaDto registro){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        List<GanaciasDiariasDto> solicitudes = new ArrayList<GanaciasDiariasDto>();
+        solicitudes = db.Reporte_ganancias(registro);
 
         return solicitudes;
     }

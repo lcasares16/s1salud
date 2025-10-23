@@ -10844,6 +10844,155 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
         return resp;
     }
+
+    public List<RepInventarioDto> Reporte_inventario(SalidaRefeFechaDto entrada
+
+    ) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<RepInventarioDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{call farmacia.reporte_inventario(?,?)}");
+
+
+                stmt.registerOutParameter(1, Types.OTHER);
+                stmt.setString(1, entrada.getPfecha1());
+                stmt.setString(2, entrada.getPfecha2());
+
+
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+                    RepInventarioDto sol = new RepInventarioDto();
+                    ObjectMapper mapper = new ObjectMapper();
+
+
+
+                    sol.setCodarticulo(rs.getString("cod_articulo"));
+                    sol.setDescripcion(rs.getString("descripcion"));
+                    sol.setCantidad(rs.getInt("Cantidad"));
+                    sol.setCodtipo(rs.getInt("cod_tipo"));
+                    sol.setPreciocosto(rs.getDouble("precio_costo"));
+                    sol.setPrecioventa(rs.getDouble("precio_venta"));
+                    sol.setDescuento(rs.getDouble("descuento"));
+                    sol.setEstatus(rs.getString("estatus"));
+                    sol.setFecharegistro(rs.getString("fecha_registro"));
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+
+    }
+
+
+    public List<GanaciasDiariasDto> Reporte_ganancias(SalidaRefeFechaDto entrada
+
+    ) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<GanaciasDiariasDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{call farmacia.reporte_ganancia_diaria(?,?)}");
+
+
+                stmt.registerOutParameter(1, Types.OTHER);
+                stmt.setString(1, entrada.getPfecha1());
+                stmt.setString(2, entrada.getPfecha2());
+
+
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+                    GanaciasDiariasDto sol = new GanaciasDiariasDto();
+                    ObjectMapper mapper = new ObjectMapper();
+
+
+                    sol.setIdcliente(rs.getInt("id_cliente"));
+                    sol.setFechaemision(rs.getString("fecha_emision"));
+                    sol.setCedula(rs.getInt("cedula"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setTelefonocel(rs.getString("telefono_cel"));
+                    sol.setCodarticulo(rs.getString("cod_articulo"));
+                    sol.setDescripcion(rs.getString("descripcion"));
+                    sol.setPrecioventa(rs.getDouble("precio_venta"));
+                    sol.setPreciocosto(rs.getDouble("precio_costo"));
+                    sol.setGanancia(rs.getDouble("ganancia"));
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+
+    }
     public List<RegistrarClientes> consultar_cliente(RegistrarClientes registro) {
 
         Connection conn = null;
