@@ -6,6 +6,8 @@ import com.banvenez.ast.dto.Cobertura.*;
 import com.banvenez.ast.dto.Contratos.*;
 import com.banvenez.ast.dto.Contratos.reportes.ConsultaRepContratoDto;
 import com.banvenez.ast.dto.Contratos.reportes.EntradaRepContratoDto;
+import com.banvenez.ast.dto.Seguridad.RespuestaDto;
+import com.banvenez.ast.dto.Seguridad.RegistrarUserDto;
 import com.banvenez.ast.dto.Sorteo.SalidaJsonDscDto;
 import com.banvenez.ast.dto.Sorteo.data;
 import com.banvenez.ast.dto.Suscripcion.*;
@@ -2519,7 +2521,16 @@ public class UserController {
 
 
     }
+    @PostMapping("/registrar-usuarios")
+    public RespuestaDto crearmedicoa(@RequestBody RegistrarUserDto medRequestDto) {
+        ConnectionUtil db = new ConnectionUtil();
 
+        RespuestaDto solicitudes = new RespuestaDto();
+        solicitudes = db.registrarusuario(medRequestDto);
+        return solicitudes;
+
+
+    }
 
 
 }

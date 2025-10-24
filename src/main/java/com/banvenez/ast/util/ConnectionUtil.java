@@ -10,6 +10,8 @@ import com.banvenez.ast.dto.Cobertura.SumaAsegSalidaDto;
 import com.banvenez.ast.dto.Contratos.*;
 import com.banvenez.ast.dto.Contratos.FormaPagoDto;
 import com.banvenez.ast.dto.Contratos.reportes.ConsultaRepContratoDto;
+import com.banvenez.ast.dto.Seguridad.RespuestaDto;
+import com.banvenez.ast.dto.Seguridad.RegistrarUserDto;
 import com.banvenez.ast.dto.Suscripcion.*;
 import com.banvenez.ast.dto.Suscripcion.reportes.ConsultaRepReciboDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
@@ -23,11 +25,14 @@ import com.banvenez.ast.dto.reportes.RepReclamoDto;
 import com.banvenez.ast.dto.reportes.RepSuscripcionDto;
 import com.banvenez.ast.dto.reportes.SalidaRepDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
+
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 
 public class ConnectionUtil {
 
@@ -862,7 +867,65 @@ public class ConnectionUtil {
     }
 
 
-///Activa e Inactiva Usuario
+
+    public List<ValidaUser> valida_user_en_linea(String user, String password) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<ValidaUser> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+                CallableStatement stmt = conn.prepareCall("{call msint.validar_user_linea(?,? )}");
+                stmt.registerOutParameter(1, Types.OTHER);
+                stmt.setString(1, user);
+                stmt.setString(2, password);
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+                    // Procesar los datos del ResultSet
+
+
+                    ValidaUser sol = new ValidaUser();
+
+                    sol.setCod_respuesta(rs.getString("cod_respuesta"));
+                    sol.setDescripcion(rs.getString("descripcion"));
+                    sol.setCod_aplicacion(rs.getInt("aplicativo"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setApellido(rs.getString("apellido"));
+                    sol.setPerfil(rs.getString("perfil"));
+                    resp.add(sol);
+
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+    ///Activa e Inactiva Usuario
 //
 public List<ValidaUser> act_ina_user(String user, Integer valor) {
 
@@ -11685,6 +11748,139 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 sol.setClave(resultado);
                 // resp.((resultado));
                 resp.setClave((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<RetornaBenefiDto> ConsultaBeneficiarioNew(Integer cedula
+
+    ) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        //RetornaDto resp = new RetornaDto();
+        List<RetornaBenefiDto> resp =   new ArrayList<>();
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{call qualitas.consulta_beneficiario(?)}");
+                //LocalDate localDate = LocalDate.of(fechaMovimiento);
+                //  java.sql.Date sqlDate = java.sql.Date.valueOf(fechaMovimiento);
+
+                stmt.registerOutParameter(1, Types.OTHER);
+                stmt.setInt(1, cedula);
+
+
+
+                stmt.execute();
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+                    RetornaBenefiDto sol = new RetornaBenefiDto();
+
+                    sol.setNumerocontrato(rs.getString("v_numero_contrato"));
+                    sol.setNombre(rs.getString("v_nombre"));
+                    sol.setFechadesde(rs.getString("v_fecha_desde"));
+                    sol.setFechahasta(rs.getString("v_fecha_hasta"));
+                    sol.setStatussuscripcion(rs.getString("v_status"));
+                    sol.setSexo(rs.getString("v_sexo"));
+                    sol.setEstadocivil(rs.getString("v_estado_civil"));
+                    sol.setParentesco(rs.getString("v_parentesco"));
+                    sol.setStatuscontrato(rs.getString("vs_status"));
+                    sol.setFechanacimiento(rs.getString("v_fecha_nacimiento"));
+                    sol.setCuotaspendiente(rs.getInt("cuota"));
+                    sol.setSumaasegurada(rs.getDouble("v_suma_asegurada"));
+                    sol.setGastosclinicas(rs.getDouble("v_gastos_clinicas"));
+                    sol.setSaldoactual(rs.getDouble("v_saldo_actual"));
+                    sol.setPlan(rs.getString("plan"));
+
+
+                    resp.add(sol);
+                }
+
+
+
+                conn.commit();
+
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public RespuestaDto registrarusuario(RegistrarUserDto citaRequest) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        RespuestaDto resp =   new RespuestaDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call msint.nuevo_usuario_linea(?, ?, ?, ?, ?, ?,?,?,?,?,?)}");
+
+                stmt.registerOutParameter(1, Types.INTEGER); // Set the output parameter type
+                stmt.setString(2, citaRequest.getIdeUsuario());
+                stmt.setInt(3, citaRequest.getDocUsuario());
+                stmt.setString(4, citaRequest.getNomUsuario());
+                stmt.setString(5, citaRequest.getApeUsuario());
+                stmt.setString(6, citaRequest.getEmaUsuario());
+                stmt.setInt(7, citaRequest.getEstUsuario());
+                stmt.setString(8, citaRequest.getPassword());
+                stmt.setString(9, citaRequest.getFechaNacimiento());
+                stmt.setString(10, citaRequest.getTipoIdentificacion());
+                stmt.setString(11, citaRequest.getTelefonoLocal());
+                stmt.setString(12, citaRequest.getCelular());
+
+
+
+
+                stmt.execute();
+                Integer resultado = stmt.getInt(1);
+                RespuestaDto sol = new RespuestaDto();
+                sol.setRespuesta(resultado);
+                // resp.((resultado));
+                resp.setRespuesta((resultado));
 
 
 
