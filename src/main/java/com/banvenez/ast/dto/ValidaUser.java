@@ -13,4 +13,5 @@ public class ValidaUser {
     private String apellido;
     private String perfil;
     private String token;
+    private Integer cedula;
 }

@@ -902,6 +902,7 @@ public class ConnectionUtil {
                     sol.setNombre(rs.getString("nombre"));
                     sol.setApellido(rs.getString("apellido"));
                     sol.setPerfil(rs.getString("perfil"));
+                    sol.setCedula(rs.getInt("v_cedula"));
                     resp.add(sol);
 
                 }
