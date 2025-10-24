@@ -2127,6 +2127,9 @@ public RecibirRespDto Modificar_Menu( Integer p_custid, String p_descripcion2, S
     }
 
 
+
+
+
 public RecRespStringDto ActualizoSuscripcion(  String numero_contrato,
                                                String  codigo_localidad,
                                                String  plan,
@@ -11825,6 +11828,69 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
                 conn.commit();
 
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public List<LineaSuscripcionDto> Consulta_Suscripcion_linea(String contrato) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<LineaSuscripcionDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call qualitas.consulta_suscripcion_linea()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, contrato);
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+                    LineaSuscripcionDto sol = new LineaSuscripcionDto();
+                    ObjectMapper mapper = new ObjectMapper();
+                    sol.setNumero_contrato(rs.getString("numero_contrato"));
+                    sol.setCedula(rs.getInt("cedula"));
+                    sol.setCertificado(rs.getInt("certificado"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setFecha_nacimiento(rs.getString("fecha_nacimiento"));
+                    sol.setSexo(rs.getString("sexo"));
+                    sol.setParentesco(rs.getString("parentesco"));
+                    sol.setStatus(rs.getString("status"));
+
+
+
+
+
+
+
+                    resp.add(sol);
+                }
+                ObjectMapper mapper = new ObjectMapper();
+
+                rs.close();
                 stmt.close();
                 conn.close();
 

@@ -746,27 +746,9 @@ public class UserController {
     public List<InsSuscripcionDto> Consulta_Suscripcion_indv(@RequestBody ConsultaIndvDto entrada){
 
         List<InsSuscripcionDto> solicitudes = new ArrayList<>();
-
-
-
         ConnectionUtil db = new ConnectionUtil();
-//
-//        if(entrada.getCedula() == 0){
-//          Integer ced = 0;
-//        }
-//        if(entrada.getNumero_contrato() != "0"){
-//            String contrato = entrada.getNumero_contrato();
-//        }
-
         solicitudes = db.Consulta_Suscripcion_indv(entrada.getCedula(), entrada.getNumero_contrato());
-        //db.createTable(conn, "recovery");
-
-
-
         return solicitudes;
-
-        //return new ResponseEntity<>(list, HttpStatus.OK);
-
     }
 
   ///////Actualizo Contrato

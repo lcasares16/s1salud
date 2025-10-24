@@ -1,5 +1,8 @@
 package com.banvenez.ast.action;
 
+import com.banvenez.ast.dto.InsSuscripcionDto;
+import com.banvenez.ast.dto.Suscripcion.ConsultaIndvDto;
+import com.banvenez.ast.dto.Suscripcion.LineaSuscripcionDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.CedulaBeneficiarioDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
 import com.banvenez.ast.util.ConnectionUtil;
@@ -32,6 +35,31 @@ public class AuthenticatedController {
 
             solicitudes = db.ConsultaBeneficiarioNew(
                     registro.getCedula()
+
+
+            );
+
+            return ResponseEntity.ok(solicitudes);
+        } catch (JwtException e) { // Captura solo la excepción específica
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Devuelve 500 Internal Server Error
+        }
+    }
+
+
+    @PostMapping("/consulta-suscripcion-linea")
+    public ResponseEntity<List<LineaSuscripcionDto>> ConsultaSuscripcionIndv(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                             @RequestBody ConsultaIndvDto registro) throws Exception {
+
+        try {
+            jwtUtil.validateJwtToken(token);
+            List<LineaSuscripcionDto> solicitudes = new ArrayList<LineaSuscripcionDto>();
+
+            solicitudes = db.Consulta_Suscripcion_linea(
+                    registro.getNumero_contrato()
 
 
             );
