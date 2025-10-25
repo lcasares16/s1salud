@@ -6,8 +6,10 @@ import com.banvenez.ast.dto.Cobertura.*;
 import com.banvenez.ast.dto.Contratos.*;
 import com.banvenez.ast.dto.Contratos.reportes.ConsultaRepContratoDto;
 import com.banvenez.ast.dto.Contratos.reportes.EntradaRepContratoDto;
+import com.banvenez.ast.dto.Seguridad.IngresoUserDataDto;
 import com.banvenez.ast.dto.Seguridad.RespuestaDto;
 import com.banvenez.ast.dto.Seguridad.RegistrarUserDto;
+import com.banvenez.ast.dto.Seguridad.ValidaDatosUser;
 import com.banvenez.ast.dto.Sorteo.SalidaJsonDscDto;
 import com.banvenez.ast.dto.Sorteo.data;
 import com.banvenez.ast.dto.Suscripcion.*;
@@ -16,12 +18,14 @@ import com.banvenez.ast.dto.Suscripcion.reportes.ConsultaRepReciboDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.EntradaRepReciboDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
 import com.banvenez.ast.dto.administracion.*;
+import com.banvenez.ast.dto.citas.EspecialidadDto;
 import com.banvenez.ast.dto.reclamo.*;
 import com.banvenez.ast.dto.reportes.*;
 import com.banvenez.ast.util.ConnectionUtil;
 //import com.example.springbootwithpostgresqldevelopment.entities.*;
 //import com.example.springbootwithpostgresqldevelopment.repo.UserRepo;
 
+import com.banvenez.ast.util.EmailSender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -2509,10 +2513,40 @@ public class UserController {
 
         RespuestaDto solicitudes = new RespuestaDto();
         solicitudes = db.registrarusuario(medRequestDto);
+
         return solicitudes;
 
 
     }
 
+
+    @PostMapping("/consulta-datos-user")
+    public List<ValidaDatosUser> consultaespecialidadactula(@RequestBody IngresoUserDataDto registro){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+
+        List<ValidaDatosUser> solicitudes = new ArrayList<ValidaDatosUser>();
+
+        solicitudes = db.valida_datos_en_linea(
+                registro.getTipo(),
+                registro.getCedula(),
+                registro.getCorreo()
+        );
+        if (solicitudes != null && !solicitudes.isEmpty() && "01".equals(solicitudes.get(0).getCod_respuesta())) {
+            // ...
+
+            String destinatario = solicitudes.get(0).getCorreo();
+            String asunto = "Recuerde su clave";
+            String cuerpo = "<p>Su clave en <strong>S1salud en línea</strong> es la siguiente:</p>" +
+                    "<p><strong>" + solicitudes.get(0).getClave() + "</strong></p>";
+
+
+            EmailSender.enviarCorreo(destinatario, asunto, cuerpo);
+        }
+
+
+        return solicitudes;
+    }
 
 }

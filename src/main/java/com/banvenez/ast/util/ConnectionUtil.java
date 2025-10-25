@@ -12,6 +12,7 @@ import com.banvenez.ast.dto.Contratos.FormaPagoDto;
 import com.banvenez.ast.dto.Contratos.reportes.ConsultaRepContratoDto;
 import com.banvenez.ast.dto.Seguridad.RespuestaDto;
 import com.banvenez.ast.dto.Seguridad.RegistrarUserDto;
+import com.banvenez.ast.dto.Seguridad.ValidaDatosUser;
 import com.banvenez.ast.dto.Suscripcion.*;
 import com.banvenez.ast.dto.Suscripcion.reportes.ConsultaRepReciboDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
@@ -903,6 +904,65 @@ public class ConnectionUtil {
                     sol.setApellido(rs.getString("apellido"));
                     sol.setPerfil(rs.getString("perfil"));
                     sol.setCedula(rs.getInt("v_cedula"));
+                    resp.add(sol);
+
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<ValidaDatosUser> valida_datos_en_linea(String tipo, Integer cedula, String correo) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<ValidaDatosUser> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+                CallableStatement stmt = conn.prepareCall("{call msint.validar_datos_linea(?,?,? )}");
+                stmt.registerOutParameter(1, Types.OTHER);
+                stmt.setString(1, tipo);
+                stmt.setInt(2, cedula);
+                stmt.setString(3, correo);
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+                    // Procesar los datos del ResultSet
+
+
+                    ValidaDatosUser sol = new ValidaDatosUser();
+
+                    sol.setCod_respuesta(rs.getString("cod_respuesta"));
+                    sol.setDescripcion(rs.getString("descripcion"));
+                    sol.setCod_aplicacion(rs.getInt("aplicativo"));
+                    sol.setNombre(rs.getString("nombre"));
+                    sol.setApellido(rs.getString("apellido"));
+                    sol.setPerfil(rs.getString("perfil"));
+                    sol.setCedula(rs.getInt("v_cedula"));
+                    sol.setClave(rs.getString("passwordconv"));
+                    sol.setCorreo(rs.getString("correo"));
                     resp.add(sol);
 
                 }

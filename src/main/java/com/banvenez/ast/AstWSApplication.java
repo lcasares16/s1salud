@@ -4,6 +4,7 @@ import com.banvenez.ast.dto.RecRespStringDto;
 import com.banvenez.ast.dto.administracion.RespuesatTasaBcvDto;
 import com.banvenez.ast.util.BcvServices;
 import com.banvenez.ast.util.ConnectionUtil;
+import com.banvenez.ast.util.EmailSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -207,7 +208,23 @@ ServicioHttpBcv bcvservicios;
 //
 //    }
 
+   }
 
-
-    }
+//    @Scheduled(cron="${cron.email}")
+//    public void sincronizacionemail(){
+//
+//        try {
+//            String destinatario = "lcasares1604@gmail.com";
+//            String asunto = "Clave dinamica";
+//            String cuerpo = "Nueva clave dinamica";
+//
+//            EmailSender.enviarCorreo(destinatario, asunto, cuerpo);
+//
+//        }catch (Exception e){
+//            log.error("AstWSApplication:sincronizacionBcv  ==>");
+//            log.error(e.getMessage());
+//        }
+//        log.info("Tiempo Estimado del Proceso  Cron sincronizadorD  ==> ");
+//
+//    }
 }
