@@ -6784,6 +6784,8 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                     sol.setGastosclinicas(rs.getDouble("v_gastos_clinicas"));
                     sol.setSaldoactual(rs.getDouble("v_saldo_actual"));
                     sol.setPlan(rs.getString("plan"));
+                    sol.setGastoscitas(rs.getDouble("totalcitas"));
+                    sol.setGastosfarmacia(rs.getDouble("totalfarmacia"));
 
 
                     resp.add(sol);
@@ -8259,6 +8261,84 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                   sol.setEstatus(rs.getString("estatus"));
                   sol.setContratante(rs.getString("contratante"));
                   sol.setPrecio(rs.getDouble("precio"));
+
+
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public List<CitaDto> reportecitas(SalidaRefeFechaDto entrada) {
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<CitaDto> citas = new ArrayList<>();
+        List<CitaDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(
+                    conexion.getUrl() + conexion.getDbname(),
+                    conexion.getUser(),
+                    conexion.getPass()
+            );
+            conn.setAutoCommit(false);
+
+            if (conn != null) {
+                CallableStatement stmt = conn.prepareCall("{? = call citas_medicas.reporte_citas(?,?)}");
+                stmt.registerOutParameter(1, Types.OTHER);
+                stmt.setString(2, entrada.getPfecha1());
+                stmt.setString(3, entrada.getPfecha2());
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1);
+
+                while (rs.next()) {
+
+
+                    CitaDto sol = new CitaDto();
+
+                    sol.setCitaId(rs.getInt("cita_id"));
+                    sol.setPacienteId(rs.getInt("paciente_id"));
+                    sol.setPacienteNombreCompleto(rs.getString("nombrepaciente"));
+                    sol.setMedicoId(rs.getInt("medico_id"));
+                    sol.setMedicoNombreCompleto(rs.getString("nombremedico"));
+                    sol.setEspecialidad(rs.getInt("especialidad"));
+                    sol.setMedicoEspecialidad(rs.getString("medicoEspecialidad"));
+                    sol.setFechaHora(rs.getString("fecha_hora"));
+                    sol.setMotivo(rs.getString("motivo"));
+                    sol.setNotasMedico(rs.getString("notas_medico"));
+                    sol.setNotasPaciente(rs.getString("notas_paciente"));
+                    sol.setFechaCreacion(rs.getString("fecha_creacion"));
+                    sol.setFechaActualizacion(rs.getString("fecha_actualizacion"));
+                    sol.setNumerocontrato(rs.getString("numero_contrato"));
+                    sol.setCodigosuscripcion(rs.getInt("codigo_suscripcion"));
+                    sol.setCedula(rs.getInt("cedula"));
+                    sol.setClaveclinica(rs.getInt("clave_clinica"));
+                    sol.setClinicaid(rs.getInt("clinica_id"));
+                    sol.setNombreclinica(rs.getString("nombreclinica"));
+                    sol.setEstado(rs.getInt("estado"));
+                    sol.setEstatus(rs.getString("estatus"));
+                    sol.setContratante(rs.getString("contratante"));
+                    sol.setPrecio(rs.getDouble("precio"));
 
 
 

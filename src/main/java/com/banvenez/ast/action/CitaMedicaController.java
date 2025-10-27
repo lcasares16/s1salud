@@ -5,11 +5,9 @@ import com.banvenez.ast.dto.Suscripcion.CargaPrincipalDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.CedulaBeneficiarioDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
 import com.banvenez.ast.dto.administracion.RetornoCobraCuotasDto;
+import com.banvenez.ast.dto.administracion.SalidaRefeFechaDto;
 import com.banvenez.ast.dto.citas.*;
-import com.banvenez.ast.dto.farmacia.DetFacturaDto;
-import com.banvenez.ast.dto.farmacia.Estados;
-import com.banvenez.ast.dto.farmacia.RegistrarInventarioDto;
-import com.banvenez.ast.dto.farmacia.Resultado;
+import com.banvenez.ast.dto.farmacia.*;
 import com.banvenez.ast.util.ConnectionUtil;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -906,6 +904,17 @@ public class CitaMedicaController {
         return solicitudes;
 
 
+    }
+
+    @PostMapping("/reporte-citas")
+    public  List<CitaDto> reporteinventario(@RequestBody SalidaRefeFechaDto registro){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        List<CitaDto> solicitudes = new ArrayList<CitaDto>();
+        solicitudes = db.reportecitas(registro);
+
+        return solicitudes;
     }
 
 
