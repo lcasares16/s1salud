@@ -12013,6 +12013,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                     sol.setGastosclinicas(rs.getDouble("v_gastos_clinicas"));
                     sol.setSaldoactual(rs.getDouble("v_saldo_actual"));
                     sol.setPlan(rs.getString("plan"));
+                    sol.setNombrecontrato(rs.getString("nombrecontrato"));
 
 
                     resp.add(sol);

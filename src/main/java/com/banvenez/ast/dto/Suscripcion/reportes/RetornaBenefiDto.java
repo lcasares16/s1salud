@@ -23,6 +23,7 @@ public class RetornaBenefiDto {
     private String plan;
     private Double gastoscitas;
     private Double gastosfarmacia;
+    private String nombrecontrato;
 
 
 
