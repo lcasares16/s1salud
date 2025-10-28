@@ -7,6 +7,8 @@ import com.banvenez.ast.dto.Suscripcion.ConsultaIndvDto;
 import com.banvenez.ast.dto.Suscripcion.LineaSuscripcionDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.CedulaBeneficiarioDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
+import com.banvenez.ast.dto.farmacia.ConsultaRecLinea;
+import com.banvenez.ast.dto.farmacia.RespuestaReclLinesDto;
 import com.banvenez.ast.util.ConnectionUtil;
 import com.banvenez.ast.util.EmailSender;
 import com.banvenez.ast.util.JwtUtil;
@@ -62,7 +64,8 @@ public class AuthenticatedController {
             List<LineaSuscripcionDto> solicitudes = new ArrayList<LineaSuscripcionDto>();
 
             solicitudes = db.Consulta_Suscripcion_linea(
-                    registro.getNumero_contrato()
+                    registro.getNumero_contrato(),
+                    registro.getCertificado()
 
 
             );
@@ -112,4 +115,30 @@ public class AuthenticatedController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Devuelve 500 Internal Server Error
         }
     }
+
+    @PostMapping("/consultar-reclamo-en-linea")
+    public ResponseEntity<List<RespuestaReclLinesDto>> ConsultaReclamoLinea(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                             @RequestBody ConsultaRecLinea registro) throws Exception {
+
+        try {
+            jwtUtil.validateJwtToken(token);
+            List<RespuestaReclLinesDto> solicitudes = new ArrayList<RespuestaReclLinesDto>();
+
+            solicitudes = db.consulta_reclamo_linea(
+                    registro
+
+
+            );
+
+            return ResponseEntity.ok(solicitudes);
+        } catch (JwtException e) { // Captura solo la excepción específica
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Devuelve 500 Internal Server Error
+        }
+    }
+
+
 }

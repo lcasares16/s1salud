@@ -9,6 +9,7 @@ public class ConsultaIndvDto {
 
     private String numero_contrato;
     private Integer cedula;
+    private Integer certificado;
 
 
 }

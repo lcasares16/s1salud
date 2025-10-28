@@ -12014,6 +12014,9 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                     sol.setSaldoactual(rs.getDouble("v_saldo_actual"));
                     sol.setPlan(rs.getString("plan"));
                     sol.setNombrecontrato(rs.getString("nombrecontrato"));
+                    sol.setCertificado(rs.getInt("certificado"));
+
+
 
 
                     resp.add(sol);
@@ -12039,7 +12042,7 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         return resp;
     }
 
-    public List<LineaSuscripcionDto> Consulta_Suscripcion_linea(String contrato) {
+    public List<LineaSuscripcionDto> Consulta_Suscripcion_linea(String contrato, Integer certificado) {
 
         Connection conn = null;
         ConexionDto conexion = new ConexionDto();
@@ -12053,9 +12056,10 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
 
 
 
-                CallableStatement stmt = conn.prepareCall("{? = call qualitas.consulta_suscripcion_linea()}");
+                CallableStatement stmt = conn.prepareCall("{? = call qualitas.consulta_suscripcion_linea(?)}");
                 stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
                 stmt.setString(1, contrato);
+                stmt.setInt(2, certificado);
 
                 stmt.execute();
 

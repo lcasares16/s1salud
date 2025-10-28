@@ -24,6 +24,7 @@ public class RetornaBenefiDto {
     private Double gastoscitas;
     private Double gastosfarmacia;
     private String nombrecontrato;
+    private Integer certificado;
 
 
 

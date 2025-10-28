@@ -398,7 +398,7 @@ public class FarmaciaController {
         return solicitudes;
     }
 
-    @PostMapping("/consultar-reclamo-en-linea")
+    @PostMapping("/consultar-reclamo-en")
     public  List<RespuestaReclLinesDto> consultar_reclamo_linea(@RequestBody ConsultaRecLinea registro){
 
 
