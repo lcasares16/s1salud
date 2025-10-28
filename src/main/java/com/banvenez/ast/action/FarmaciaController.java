@@ -398,5 +398,17 @@ public class FarmaciaController {
         return solicitudes;
     }
 
+    @PostMapping("/consultar-reclamo-en-linea")
+    public  List<RespuestaReclLinesDto> consultar_reclamo_linea(@RequestBody ConsultaRecLinea registro){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        List<RespuestaReclLinesDto> solicitudes = new ArrayList<RespuestaReclLinesDto>();
+        solicitudes = db.consulta_reclamo_linea(registro
+        );
+
+        return solicitudes;
+    }
+
 
 }

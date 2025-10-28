@@ -11275,6 +11275,59 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         return resp;
     }
 
+    public List<RespuestaReclLinesDto> consulta_reclamo_linea(ConsultaRecLinea registro) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<RespuestaReclLinesDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+                CallableStatement stmt = conn.prepareCall("{call farmacia.consulta_rcl_enlinea(?)}");
+                stmt.registerOutParameter(1, Types.OTHER);
+                stmt.setInt(1, registro.getCedula());
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+                    // Procesar los datos del ResultSet
+                    RespuestaReclLinesDto sol = new RespuestaReclLinesDto();
+                    sol.setNumeroreclamo(rs.getInt("numeroreclamo"));
+                    sol.setTotalreclamo(rs.getDouble("totalreclamo"));
+
+
+
+
+
+                    resp.add(sol);
+                }
+                conn.commit();
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
 
 
     public List<programacionDto> consultar_programacion(Integer idprogrmacion) {
