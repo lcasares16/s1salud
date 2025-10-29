@@ -2449,7 +2449,7 @@ public class UserController {
     public RetornoCobraCuotasDto cobracuotaspagos(@RequestBody FormaPagoCuotasDto entrada){
 
         RetornoCobraCuotasDto solicitudes = new RetornoCobraCuotasDto();
-
+        RetornoCobraCuotasDto solicitudesfinal = new RetornoCobraCuotasDto();
 
         ConnectionUtil db = new ConnectionUtil();
 
@@ -2461,7 +2461,7 @@ public class UserController {
             RetornoCobraCuotasDto detpagos = new RetornoCobraCuotasDto();
             solicitudes = detpagos;
             System.out.println("Detalle cuotas " + detpagos);
-            solicitudes = db.CobraCuotaIndv(
+            solicitudesfinal = db.CobraCuotaIndv(
 
                     pago.getP_numero_contrato(),
                     pago.getP_codigo_suscricion(),
@@ -2502,7 +2502,7 @@ public class UserController {
         );
 
 
-        return solicitudes;
+        return solicitudesfinal;
 
 
 
