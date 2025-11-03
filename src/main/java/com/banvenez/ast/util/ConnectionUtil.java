@@ -963,6 +963,7 @@ public class ConnectionUtil {
                     sol.setCedula(rs.getInt("v_cedula"));
                     sol.setClave(rs.getString("passwordconv"));
                     sol.setCorreo(rs.getString("correo"));
+                    sol.setCodigoValidacion(rs.getInt("codigo"));
                     resp.add(sol);
 
                 }

@@ -15,4 +15,5 @@ public class ValidaDatosUser {
     private Integer cedula;
     private String clave;
     private String correo;
+    private Integer codigoValidacion;
 }
