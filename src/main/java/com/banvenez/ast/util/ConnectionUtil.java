@@ -10,9 +10,7 @@ import com.banvenez.ast.dto.Cobertura.SumaAsegSalidaDto;
 import com.banvenez.ast.dto.Contratos.*;
 import com.banvenez.ast.dto.Contratos.FormaPagoDto;
 import com.banvenez.ast.dto.Contratos.reportes.ConsultaRepContratoDto;
-import com.banvenez.ast.dto.Seguridad.RespuestaDto;
-import com.banvenez.ast.dto.Seguridad.RegistrarUserDto;
-import com.banvenez.ast.dto.Seguridad.ValidaDatosUser;
+import com.banvenez.ast.dto.Seguridad.*;
 import com.banvenez.ast.dto.Suscripcion.*;
 import com.banvenez.ast.dto.Suscripcion.reportes.ConsultaRepReciboDto;
 import com.banvenez.ast.dto.Suscripcion.reportes.RetornaBenefiDto;
@@ -939,7 +937,7 @@ public class ConnectionUtil {
             conn.setAutoCommit(false);
             if (conn != null) {
 
-                CallableStatement stmt = conn.prepareCall("{call msint.validar_datos_linea(?,?,? )}");
+                CallableStatement stmt = conn.prepareCall("{call msint.validar_datos_linea(?,?,?)}");
                 stmt.registerOutParameter(1, Types.OTHER);
                 stmt.setString(1, tipo);
                 stmt.setInt(2, cedula);
@@ -967,7 +965,7 @@ public class ConnectionUtil {
                     resp.add(sol);
 
                 }
-
+                conn.commit();
                 rs.close();
                 stmt.close();
                 conn.close();
@@ -12144,6 +12142,103 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 stmt.execute();
                 Integer resultado = stmt.getInt(1);
                 RespuestaDto sol = new RespuestaDto();
+                sol.setRespuesta(resultado);
+                // resp.((resultado));
+                resp.setRespuesta((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+    public RespuestaSeguridadDto validacoidgoseg(CodigoSeguridadDto citaRequest) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        RespuestaSeguridadDto resp =   new RespuestaSeguridadDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call msint.valida_codigo_seguridad(?)}");
+
+                stmt.registerOutParameter(1, Types.VARCHAR); // Set the output parameter type
+                stmt.setInt(2, citaRequest.getCodigo());
+
+                stmt.execute();
+                String resultado = stmt.getString(1);
+                RespuestaSeguridadDto sol = new RespuestaSeguridadDto();
+                sol.setRespuesta(resultado);
+                // resp.((resultado));
+                resp.setRespuesta((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public RespuestaSeguridadDto cambiacntrasena(CambiaContasenaDto citaRequest) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        RespuestaSeguridadDto resp =   new RespuestaSeguridadDto();
+
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call msint.cambia_contrasena(?,?)}");
+
+                stmt.registerOutParameter(1, Types.VARCHAR); // Set the output parameter type
+                stmt.setInt(2, citaRequest.getCedula());
+                stmt.setString(3, citaRequest.getConfirmarContrasena());
+
+                stmt.execute();
+                String resultado = stmt.getString(1);
+                RespuestaSeguridadDto sol = new RespuestaSeguridadDto();
                 sol.setRespuesta(resultado);
                 // resp.((resultado));
                 resp.setRespuesta((resultado));

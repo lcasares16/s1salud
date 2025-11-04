@@ -6,10 +6,7 @@ import com.banvenez.ast.dto.Cobertura.*;
 import com.banvenez.ast.dto.Contratos.*;
 import com.banvenez.ast.dto.Contratos.reportes.ConsultaRepContratoDto;
 import com.banvenez.ast.dto.Contratos.reportes.EntradaRepContratoDto;
-import com.banvenez.ast.dto.Seguridad.IngresoUserDataDto;
-import com.banvenez.ast.dto.Seguridad.RespuestaDto;
-import com.banvenez.ast.dto.Seguridad.RegistrarUserDto;
-import com.banvenez.ast.dto.Seguridad.ValidaDatosUser;
+import com.banvenez.ast.dto.Seguridad.*;
 import com.banvenez.ast.dto.Sorteo.SalidaJsonDscDto;
 import com.banvenez.ast.dto.Sorteo.data;
 import com.banvenez.ast.dto.Suscripcion.*;
@@ -2538,8 +2535,8 @@ public class UserController {
 
             String destinatario = solicitudes.get(0).getCorreo();
             String asunto = "Recuerde su clave";
-            String cuerpo = "<p>Su clave en <strong>S1salud en línea</strong> es la siguiente:</p>" +
-                    "<p><strong>" + solicitudes.get(0).getClave() + "</strong></p>";
+            String cuerpo = "<p>Su clave de operación especial en <strong>S1salud en línea</strong> es la siguiente:</p>" +
+                            "<p><strong>" + solicitudes.get(0).getCodigoValidacion() + "</strong></p>";
 
 
             EmailSender.enviarCorreo(destinatario, asunto, cuerpo);
@@ -2547,6 +2544,32 @@ public class UserController {
 
 
         return solicitudes;
+    }
+
+
+    @PostMapping("/valida-codigo-seguridad")
+    public RespuestaSeguridadDto validacodigoseg(@RequestBody CodigoSeguridadDto entrada) {
+        ConnectionUtil db = new ConnectionUtil();
+
+        RespuestaSeguridadDto solicitudes = new RespuestaSeguridadDto();
+        solicitudes = db.validacoidgoseg(entrada);
+
+        return solicitudes;
+
+
+    }
+
+
+    @PostMapping("/cambia-contrasena")
+    public RespuestaSeguridadDto cambiaclave(@RequestBody CambiaContasenaDto entrada) {
+        ConnectionUtil db = new ConnectionUtil();
+
+        RespuestaSeguridadDto solicitudes = new RespuestaSeguridadDto();
+        solicitudes = db.cambiacntrasena(entrada);
+
+        return solicitudes;
+
+
     }
 
 }
