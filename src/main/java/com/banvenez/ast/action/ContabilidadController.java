@@ -1,7 +1,9 @@
 package com.banvenez.ast.action;
 
 import com.banvenez.ast.dto.citas.programacionDto;
+import com.banvenez.ast.dto.contabilidad.DetopercontDto;
 import com.banvenez.ast.dto.contabilidad.MaestroCtasDto;
+import com.banvenez.ast.dto.contabilidad.OperacionContableDto;
 import com.banvenez.ast.dto.farmacia.Estados;
 import com.banvenez.ast.dto.farmacia.Resultado;
 import com.banvenez.ast.util.ConnectionContabilidad;
@@ -80,6 +82,49 @@ public class ContabilidadController {
         );
 
         return solicitudes;
+    }
+
+
+    @PostMapping("/consulta-oper-contable")
+    public List<DetopercontDto> operacioncontable(){
+
+        List<DetopercontDto> solicitudes = new ArrayList<DetopercontDto>();
+        solicitudes = db.opercontab();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/registrar-oper-detalle")
+    public Resultado operdetalles(@RequestBody DetopercontDto registro){
+
+
+        Resultado solicitudes = new Resultado();
+        solicitudes = db.registraroperconta(registro);
+
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/consulta-tip-oper")
+    public List<Estados> tipooper(){
+
+        List<Estados> solicitudes = new ArrayList<Estados>();
+        solicitudes = db.consultaTipooper();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/consulta-oper-cont-gen")
+    public List<OperacionContableDto> opercontable(){
+
+        List<OperacionContableDto> solicitudes = new ArrayList<OperacionContableDto>();
+        solicitudes = db.opercontables();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
     }
 
 
