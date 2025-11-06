@@ -11000,6 +11000,67 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
         return resp;
     }
 
+
+
+    public List<ParametrosDto> Consultaparametros() {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        List<ParametrosDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call farmacia.consulta_parametros()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+                    ParametrosDto sol = new ParametrosDto();
+
+                    sol.setFechaCreacion(rs.getString("fecha_creacion"));
+                    sol.setIslr(rs.getDouble("islr"));
+                    sol.setIva(rs.getDouble("iva"));
+                    sol.setIgtf(rs.getDouble("igtf"));
+                    sol.setDescuentoMedico(rs.getDouble("decuento_medico"));
+                    sol.setDescuentoFactura(rs.getDouble("decuento_factura"));
+                    sol.setUsuarioMod(rs.getString("usuario_mod"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+
     public List<Estados> Consulta_banco() {
 
         Connection conn = null;
@@ -12242,6 +12303,68 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 sol.setRespuesta(resultado);
                 // resp.((resultado));
                 resp.setRespuesta((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public Resultado atualiza_parametros(
+//            String factura,
+//            String despacho,
+//            Integer codaplicativo
+            ParametrosDto registro
+
+    ) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Resultado resp =   new Resultado();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+                CallableStatement stmt = conn.prepareCall("{call farmacia.cambia_parametros(?,?,?,?,?,?,?)}");
+                stmt.registerOutParameter(1, Types.VARCHAR);
+
+                stmt.setString(1, registro.getFechaCreacion());
+                stmt.setDouble(2, registro.getIslr());
+                stmt.setDouble(3, registro.getIva());
+                stmt.setDouble(4, registro.getIgtf());
+                stmt.setDouble(5, registro.getDescuentoMedico());
+                stmt.setDouble(6, registro.getDescuentoFactura());
+                stmt.setString(7, registro.getUsuarioMod());
+
+
+
+
+
+
+                stmt.execute();
+                String resultado = stmt.getString(1);
+                Resultado sol = new Resultado();
+                sol.setRetorno(resultado);
+                // resp.((resultado));
+                resp.setRetorno((resultado));
 
 
 

@@ -411,4 +411,30 @@ public class FarmaciaController {
     }
 
 
+    @PostMapping("/actualiza-parametros")
+    public  Resultado actualiza_parametros(@RequestBody ParametrosDto registro){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        Resultado solicitudes = new Resultado();
+        solicitudes = db.atualiza_parametros(registro
+        );
+
+        return solicitudes;
+    }
+
+    @PostMapping("/consulta-parametros")
+    public  List<ParametrosDto> consultaparametros(){
+
+
+        ConnectionUtil db = new ConnectionUtil();
+        List<ParametrosDto> solicitudes = new ArrayList<ParametrosDto>();
+        solicitudes = db.Consultaparametros(
+        );
+
+        return solicitudes;
+    }
+
+
+
 }
