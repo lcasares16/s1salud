@@ -333,6 +333,76 @@ public class ConnectionContabilidad {
         return resp;
     }
 
+
+    public List<MaestroCtasDto> maestrodetalle(MaestroCtasDto registro ) {
+
+        List<MaestroCtasDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.cuentas_detalle()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, registro.getCta1());
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    MaestroCtasDto sol = new MaestroCtasDto();
+
+                    sol.setIdecta(rs.getString("idecta"));
+                    sol.setCodcia(rs.getString("codcia"));
+                    sol.setTipcta(rs.getString("tipcta"));
+
+                    sol.setTipmov(rs.getString("tipmov"));
+                    sol.setStscta(rs.getString("stscta"));
+
+                    sol.setCta1(rs.getString("cta1"));
+                    sol.setCta2(rs.getString("cta2"));
+                    sol.setCta3(rs.getString("cta3"));
+                    sol.setCta4(rs.getString("cta4"));
+                    sol.setCta5(rs.getString("cta5"));
+                    sol.setCta6(rs.getString("cta6"));
+                    sol.setCta7(rs.getString("cta7"));
+                    sol.setCta8(rs.getString("cta8"));
+                    sol.setCta9(rs.getString("cta9"));
+                    sol.setCta10(rs.getString("cta10"));
+                    sol.setZoncta(rs.getString("zoncta"));
+                    sol.setAuxcta(rs.getString("auxcta"));
+                    sol.setNomcta(rs.getString("nomcta"));
+                    sol.setCodmoneda(rs.getString("codmoneda"));
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
     public Resultado registraroperconta(DetopercontDto entrada) {
 
         Connection conn = null;

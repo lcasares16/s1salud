@@ -127,5 +127,14 @@ public class ContabilidadController {
 
     }
 
+    @PostMapping("/consulta-maestro-detalle")
+    public List<MaestroCtasDto> maestrodetalle(@RequestBody MaestroCtasDto registro){
+
+        List<MaestroCtasDto> solicitudes = new ArrayList<MaestroCtasDto>();
+        solicitudes = db.maestrodetalle(registro);
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
 
 }
