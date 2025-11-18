@@ -1,6 +1,7 @@
 package com.banvenez.ast.action;
 
 import com.banvenez.ast.dto.citas.programacionDto;
+import com.banvenez.ast.dto.contabilidad.ConceptoAcreenciaDto;
 import com.banvenez.ast.dto.contabilidad.DetopercontDto;
 import com.banvenez.ast.dto.contabilidad.MaestroCtasDto;
 import com.banvenez.ast.dto.contabilidad.OperacionContableDto;
@@ -136,5 +137,16 @@ public class ContabilidadController {
         //return new ResponseEntity<>(list, HttpStatus.OK);
 
     }
+
+    @PostMapping("/consulta-concepto-acreencia")
+    public List<ConceptoAcreenciaDto> conceptoacre(){
+
+        List<ConceptoAcreenciaDto> solicitudes = new ArrayList<ConceptoAcreenciaDto>();
+        solicitudes = db.concetoacreencia();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
 
 }

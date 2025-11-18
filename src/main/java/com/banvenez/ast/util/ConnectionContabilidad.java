@@ -2,6 +2,7 @@ package com.banvenez.ast.util;
 
 import com.banvenez.ast.dto.ConexionDto;
 import com.banvenez.ast.dto.citas.programacionDto;
+import com.banvenez.ast.dto.contabilidad.ConceptoAcreenciaDto;
 import com.banvenez.ast.dto.contabilidad.DetopercontDto;
 import com.banvenez.ast.dto.contabilidad.MaestroCtasDto;
 import com.banvenez.ast.dto.contabilidad.OperacionContableDto;
@@ -622,6 +623,73 @@ public class ConnectionContabilidad {
                     sol.setCta10(rs.getString("cta10"));
                     sol.setAuxcta(rs.getString("auxcta"));
                     sol.setIndgprc(rs.getString("indgprc"));
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<ConceptoAcreenciaDto> concetoacreencia() {
+
+        List<ConceptoAcreenciaDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.concepto_acreencia()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    ConceptoAcreenciaDto sol = new ConceptoAcreenciaDto();
+
+                    sol.setCodGrupoAcre(rs.getString("codgrupoacre"));
+                    sol.setCodCptoAcre(rs.getString("codcptoacre"));
+                    sol.setDescCptoAcre(rs.getString("desccptoacre"));
+                    sol.setNatCptoAcre(rs.getString("natcptoacre"));
+                    sol.setIndTipoCpto(rs.getString("indtipocpto"));
+                    sol.setPorcCptoAcre(rs.getDouble("porccptoacre"));
+                    sol.setMtoCptoAcre(rs.getDouble("mtocptoacre"));
+                    sol.setIndAuto(rs.getString("indauto"));
+                    sol.setIndGenOper(rs.getString("indgenoper"));
+                    sol.setTipoId(rs.getString("tipoid"));
+                    sol.setNumId(rs.getString("numid"));
+                    sol.setDvId(rs.getString("dvid"));
+                    sol.setCodCptoAcreCoa(rs.getString("codcptoacrecoa"));
+                    sol.setCodGrupoAcreCoa(rs.getString("codgrupoacrecoa"));
+                    sol.setIndGtoMan(rs.getString("indgtoman"));
+                    sol.setIndImpGtoMan(rs.getString("indimpgtoman"));
+                    sol.setIndCptoPServicio(rs.getString("indcptopservicio"));
+                    sol.setIndCptoIServicio(rs.getString("indcptoiservicio"));
 
 
 
