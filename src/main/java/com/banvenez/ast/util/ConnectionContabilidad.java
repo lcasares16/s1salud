@@ -2,10 +2,7 @@ package com.banvenez.ast.util;
 
 import com.banvenez.ast.dto.ConexionDto;
 import com.banvenez.ast.dto.citas.programacionDto;
-import com.banvenez.ast.dto.contabilidad.ConceptoAcreenciaDto;
-import com.banvenez.ast.dto.contabilidad.DetopercontDto;
-import com.banvenez.ast.dto.contabilidad.MaestroCtasDto;
-import com.banvenez.ast.dto.contabilidad.OperacionContableDto;
+import com.banvenez.ast.dto.contabilidad.*;
 import com.banvenez.ast.dto.farmacia.Estados;
 import com.banvenez.ast.dto.farmacia.Resultado;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -714,6 +711,232 @@ public class ConnectionContabilidad {
         return resp;
     }
 
+
+
+    public List<MovCuentaDto> consultamovimientos() {
+
+        List<MovCuentaDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_movimientos()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    MovCuentaDto sol = new MovCuentaDto();
+
+                    sol.setIdecta(rs.getString("idecta"));
+                    sol.setFecmov(rs.getString("fecmov"));
+                    sol.setNcompr(rs.getInt("ncompr"));
+                    sol.setCodplani(rs.getString("codplani"));
+                    sol.setNummov(rs.getInt("nummov"));
+                    sol.setCodcia(rs.getString("codcia"));
+                    sol.setCta1(rs.getString("cta1"));
+                    sol.setCta2(rs.getString("cta2"));
+                    sol.setCta3(rs.getString("cta3"));
+                    sol.setCta4(rs.getString("cta4"));
+                    sol.setCta5(rs.getString("cta5"));
+                    sol.setCta6(rs.getString("cta6"));
+                    sol.setCta7(rs.getString("cta7"));
+                    sol.setZoncta(rs.getString("zoncta"));
+                    sol.setAuxcta(rs.getString("auxcta"));
+                    sol.setDetmov(rs.getString("detmov"));
+                    sol.setTipmov(rs.getString("tipmov"));
+                    sol.setMoncnt(rs.getDouble("moncnt"));
+                    sol.setZoncnt(rs.getString("zoncnt"));
+                    sol.setRecibo(rs.getInt("recibo"));
+                    sol.setTipdoc(rs.getString("tipdoc"));
+                    sol.setNumdoc(rs.getString("numdoc"));
+                    sol.setFecconci(rs.getString("fecconci"));
+                    sol.setIngcaja(rs.getString("ingcaja"));
+                    sol.setCorasien(rs.getDouble("corasien"));
+                    sol.setDetcta2(rs.getString("detcta2"));
+                    sol.setCoractiv(rs.getInt("coractiv"));
+                    sol.setCta8(rs.getString("cta8"));
+                    sol.setCta9(rs.getString("cta9"));
+                    sol.setCta10(rs.getString("cta10"));
+                    sol.setTipcomp(rs.getString("tipcomp"));
+                    sol.setIndauto(rs.getString("indauto"));
+                    sol.setFecinc(rs.getString("fecinc"));
+                    sol.setNumrel(rs.getInt("numrel"));
+                    sol.setTipodoc(rs.getString("tipodoc"));
+                    sol.setConciliado(rs.getString("conciliado"));
+                    sol.setIdeop(rs.getInt("ideop"));
+                    sol.setMonedaoficialBsf(rs.getString("moneda_oficial_bsf"));
+                    sol.setNcompror(rs.getInt("ncompr_or"));
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<AcreenciasDto> consultaacreencia() {
+
+        List<AcreenciasDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_acreencia()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+
+                while (rs.next()) {
+
+
+
+                    AcreenciasDto sol = new AcreenciasDto();
+
+                    sol.setNumacre(rs.getInt("numacre"));
+                    sol.setStsacre(rs.getString("stsacre"));
+                    sol.setFecsts(rs.getString("fecsts"));
+                    sol.setTipoacre(rs.getString("tipoacre"));
+                    sol.setCodmoneda(rs.getString("codmoneda"));
+                    sol.setMtoacrelocal(rs.getDouble("mtoacrelocal"));
+                    sol.setMtoacremoneda(rs.getDouble("mtoacremoneda"));
+                    sol.setFecvencacre(rs.getString("fecvencacre"));
+                    sol.setSldoacrelocal(rs.getDouble("sldoacrelocal"));
+                    sol.setSldoacremoneda(rs.getDouble("sldoacremoneda"));
+                    sol.setCodinterlider(rs.getString("codinterlider"));
+                    sol.setTipoid(rs.getString("tipoid"));
+                    sol.setNumid(rs.getInt("numid"));
+                    sol.setDvid(rs.getString("dvid"));
+                    sol.setIdefact(rs.getInt("idefact"));
+                    sol.setDptoemi(rs.getString("dptoemi"));
+                    sol.setIndtarj(rs.getString("indtarj"));
+                    sol.setIndgenrec(rs.getString("indgenrec"));
+                    sol.setTextacre(rs.getString("textacre"));
+                    sol.setSeriecttorea(rs.getInt("seriecttorea"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public List<DetalleAcreenciaDto> detalleacreencia(DetalleAcreenciaDto registro) {
+
+        List<DetalleAcreenciaDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_det_acreencia()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                if (registro.getNumacre() != null) {
+                    stmt.setInt(1, registro.getNumacre());
+                } else {
+                    stmt.setNull(1, Types.INTEGER);
+                }
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+                while (rs.next()) {
+
+
+
+                    DetalleAcreenciaDto sol = new DetalleAcreenciaDto();
+
+                    sol.setNumacre(rs.getInt("numacre"));
+                    sol.setNumdetacre(rs.getInt("numdetacre"));
+                    sol.setCodgrupoacre(rs.getString("codgrupoacre"));
+                    sol.setCodcptoacre(rs.getString("codcptoacre"));
+                    sol.setCodmoneda(rs.getString("codmoneda"));
+                    sol.setMtodetacrelocal(rs.getDouble("mtodetacrelocal"));
+                    sol.setNatcptoacre(rs.getString("natcptoacre"));
+                    sol.setMtocptoacre(rs.getDouble("mtocptoacre"));
+                    sol.setPorccptoacre(rs.getDouble("porccptoacre"));
+                    sol.setMtodetacremoneda(rs.getDouble("mtodetacremoneda"));
+                    sol.setSldodetacrelocal(rs.getDouble("sldodetacrelocal"));
+                    sol.setSldodetacremoneda(rs.getDouble("sldodetacremoneda"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
 
 
 

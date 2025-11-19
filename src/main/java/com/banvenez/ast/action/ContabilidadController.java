@@ -1,10 +1,7 @@
 package com.banvenez.ast.action;
 
 import com.banvenez.ast.dto.citas.programacionDto;
-import com.banvenez.ast.dto.contabilidad.ConceptoAcreenciaDto;
-import com.banvenez.ast.dto.contabilidad.DetopercontDto;
-import com.banvenez.ast.dto.contabilidad.MaestroCtasDto;
-import com.banvenez.ast.dto.contabilidad.OperacionContableDto;
+import com.banvenez.ast.dto.contabilidad.*;
 import com.banvenez.ast.dto.farmacia.Estados;
 import com.banvenez.ast.dto.farmacia.Resultado;
 import com.banvenez.ast.util.ConnectionContabilidad;
@@ -148,5 +145,35 @@ public class ContabilidadController {
 
     }
 
+
+    @PostMapping("/consulta-movimientos")
+    public List<MovCuentaDto> movimientos(){
+
+        List<MovCuentaDto> solicitudes = new ArrayList<MovCuentaDto>();
+        solicitudes = db.consultamovimientos();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/consulta-acreencia")
+    public List<AcreenciasDto> acreencia(){
+
+        List<AcreenciasDto> solicitudes = new ArrayList<AcreenciasDto>();
+        solicitudes = db.consultaacreencia();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/consulta-detalle-acreencia")
+    public List<DetalleAcreenciaDto> detalleacreencia(@RequestBody DetalleAcreenciaDto registro){
+
+        List<DetalleAcreenciaDto> solicitudes = new ArrayList<DetalleAcreenciaDto>();
+        solicitudes = db.detalleacreencia(registro);
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
 
 }
