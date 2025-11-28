@@ -939,5 +939,326 @@ public class ConnectionContabilidad {
     }
 
 
+    public List<ParamCptoCtaDto> parametrosconcepto() {
+
+        List<ParamCptoCtaDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_param_cpto()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+                while (rs.next()) {
+
+
+
+                    ParamCptoCtaDto sol = new ParamCptoCtaDto();
+
+                    sol.setCodcptoacre(rs.getString("codcptoacre"));
+                    sol.setIdecta(rs.getString("idecta"));
+                    sol.setTipmovDef(rs.getString("tipmov_def"));
+                    sol.setCodcia(rs.getString("codcia"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public List<AsientoContableDto> asientoscontable() {
+
+        List<AsientoContableDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_asientos_contables()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+                while (rs.next()) {
+
+
+
+                    AsientoContableDto sol = new AsientoContableDto();
+
+                    sol.setIdAsiento(rs.getInt("id_asiento"));
+                    sol.setFechaAsiento(rs.getString("fecha_asiento"));
+                    sol.setDescripcion(rs.getString("descripcion"));
+                    sol.setIdOperacion(rs.getInt("id_operacion"));
+                    sol.setIdUsuario(rs.getInt("id_usuario"));
+                    sol.setEstado(rs.getString("estado"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<DetalleAsientoDto> asientosdetalle() {
+
+        List<DetalleAsientoDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_asientos_detalles()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+                while (rs.next()) {
+
+
+
+                    DetalleAsientoDto sol = new DetalleAsientoDto();
+
+                    sol.setIdDetalle(rs.getInt("id_detalle"));
+                    sol.setIdAsiento(rs.getInt("id_asiento"));
+                    sol.setIdcta(rs.getString("idcta"));
+                    sol.setTipoMov(rs.getString("tipo_mov"));
+                    sol.setMonto(rs.getDouble("monto"));
+                    sol.setReferencia(rs.getString("referencia"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public List<ObligacionDto> obligacion() {
+
+        List<ObligacionDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_obligacion()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+                while (rs.next()) {
+
+
+
+                    ObligacionDto sol = new ObligacionDto();
+
+                    sol.setNumoblig(rs.getInt("numoblig"));
+                    sol.setTipoid(rs.getString("tipoid"));
+                    sol.setNumid(rs.getInt("numid"));
+                    sol.setDvid(rs.getString("dvid"));
+                    sol.setTipooblig(rs.getString("tipooblig"));
+                    sol.setStsoblig(rs.getString("stsoblig"));
+                    sol.setFecsts(rs.getString("fecsts"));          // ahora String
+                    sol.setFecgtiapago(rs.getString("fecgtiapago")); // ahora String
+                    sol.setTextoblig(rs.getString("textoblig"));
+                    sol.setCodmoneda(rs.getString("codmoneda"));
+                    sol.setNumprto(rs.getString("numprto"));
+                    sol.setNumfracprto(rs.getInt("numfracprto"));
+                    sol.setMtonetoobliglocal(rs.getDouble("mtonetoobliglocal"));
+                    sol.setMtobrutoobligmoneda(rs.getDouble("mtobrutoobligmoneda"));
+                    sol.setMtonetoobligmoneda(rs.getDouble("mtonetoobligmoneda"));
+                    sol.setMtobrutoobliglocal(rs.getDouble("mtobrutoobliglocal"));
+                    sol.setDptoemi(rs.getString("dptoemi"));
+                    sol.setSldoobliglocal(rs.getDouble("sldoobliglocal"));
+                    sol.setSldoobligmoneda(rs.getDouble("sldoobligmoneda"));
+                    sol.setIdesin(rs.getInt("idesin"));
+                    sol.setCodinterlider(rs.getString("codinterlider"));
+                    sol.setNumreling(rs.getInt("numreling"));
+                    sol.setNumoper(rs.getInt("numoper"));
+                    sol.setNumrelingpro(rs.getInt("numrelingpro"));
+                    sol.setNotacreditofiscal(rs.getInt("notacreditofiscal"));
+                    sol.setNumobligant(rs.getInt("numobligant"));
+                    sol.setFecanul(rs.getString("fecanul")); // ahora String
+                    sol.setCodcobrador(rs.getString("codcobrador"));
+                    sol.setEmitecheque(rs.getString("emitecheque"));
+                    sol.setIdeimpchq(rs.getInt("ideimpchq"));
+                    sol.setDvidadic(rs.getString("dvidadic"));
+                    sol.setIderecup(rs.getInt("iderecup"));
+                    sol.setNumidadic(rs.getInt("numidadic"));
+                    sol.setTipoidadic(rs.getString("tipoidadic"));
+                    sol.setVinculo(rs.getString("vinculo"));
+                    sol.setNosolicitud(rs.getInt("nosolicitud"));
+                    sol.setClaseobli(rs.getString("claseobli"));
+                    sol.setTramite(rs.getString("tramite"));
+                    sol.setSeriecttorea(rs.getInt("seriecttorea"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public List<DetalleObligacionDto> obligaciondetalle() {
+
+        List<DetalleObligacionDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_obligacion_det()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+                while (rs.next()) {
+
+
+
+                    DetalleObligacionDto sol = new DetalleObligacionDto();
+
+                    sol.setNumoblig(rs.getInt("numoblig"));
+                    sol.setNumdetoblig(rs.getInt("numdetoblig"));
+                    sol.setCodgrupooblig(rs.getString("codgrupooblig"));
+                    sol.setCodcptooblig(rs.getString("codcptooblig"));
+                    sol.setCodmoneda(rs.getString("codmoneda"));
+                    sol.setMtodetobliglocal(rs.getDouble("mtodetobliglocal"));
+                    sol.setNatcptooblig(rs.getString("natcptooblig"));
+                    sol.setMtodetobligmoneda(rs.getDouble("mtodetobligmoneda"));
+                    sol.setPorccptooblig(rs.getDouble("porccptooblig"));
+                    sol.setSldodetobliglocal(rs.getDouble("sldodetobliglocal"));
+                    sol.setSldodetobligmoneda(rs.getDouble("sldodetobligmoneda"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
 
 }

@@ -176,4 +176,54 @@ public class ContabilidadController {
 
     }
 
+    @PostMapping("/consulta-parametros-concepto")
+    public List<ParamCptoCtaDto> parametrosconcepto(){
+
+        List<ParamCptoCtaDto> solicitudes = new ArrayList<ParamCptoCtaDto>();
+        solicitudes = db.parametrosconcepto();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/consulta-asientos-contable")
+    public List<AsientoContableDto> asientos(){
+
+        List<AsientoContableDto> solicitudes = new ArrayList<AsientoContableDto>();
+        solicitudes = db.asientoscontable();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/consulta-asientos-detalle")
+    public List<DetalleAsientoDto> asientosdetalle(){
+
+        List<DetalleAsientoDto> solicitudes = new ArrayList<DetalleAsientoDto>();
+        solicitudes = db.asientosdetalle();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/consulta-obligacion")
+    public List<ObligacionDto> obligacion(){
+
+        List<ObligacionDto> solicitudes = new ArrayList<ObligacionDto>();
+        solicitudes = db.obligacion();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/consulta-obligacion-detalle")
+    public List<DetalleObligacionDto> obligaciondetalle(){
+
+        List<DetalleObligacionDto> solicitudes = new ArrayList<DetalleObligacionDto>();
+        solicitudes = db.obligaciondetalle();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
 }

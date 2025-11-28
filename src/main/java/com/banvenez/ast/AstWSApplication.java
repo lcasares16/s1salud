@@ -29,14 +29,14 @@ import java.util.Date;
 @Slf4j
 public class AstWSApplication {
 
-//    @Autowired
+    //    @Autowired
 //    SincronizadorDataService sincronizadorService;
 //
 //    @Autowired
 //    VacacionesService vacacionesService;
 //
     @Autowired
-ServicioHttpBcv bcvservicios;
+    ServicioHttpBcv bcvservicios;
 //
 //    @Autowired
 //    CronogramaHttp cronograma;
@@ -48,43 +48,43 @@ ServicioHttpBcv bcvservicios;
 
 
 
-    @Scheduled(cron="${cron.bcv}")
-    public void sincronizacionBcv(){
-        long tiempoInicial = System.currentTimeMillis();
-        long tiempoFinal = 0;
-        try {
-            log.info("Llamado al servicio  " + tiempoInicial );
-            RespuesatTasaBcvDto resp = bcvservicios.getDollarRate();
-            RecRespStringDto respfinal = new RecRespStringDto();
-            ConnectionUtil db = new ConnectionUtil();
-            String  pmoneda = "02";
-
-//            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-//            Date date = format.parse(resp.getLast_update());
-            LocalDateTime datetime = LocalDateTime.now();
-            LocalDateTime n = datetime.plusMinutes(30);
-            ZonedDateTime caracas = n.atZone(ZoneId.of("America/Guyana"));
-
-            String fecha = n.toLocalDate().toString();
-
-
-
-
-
-
-            respfinal = db.ActualizaBcv(pmoneda,resp.getPrice().toString(), fecha);
-
-            log.info("Respuesta de sincronizacionBcv " + resp);
-
-            tiempoFinal = System.currentTimeMillis();
-
-            log.info("Tiempo final " + tiempoFinal);
-            
-        }catch (Exception e){
-            log.error("AstWSApplication:sincronizacionBcv  ==>");
-            log.error(e.getMessage());
-        }
-        log.info("Tiempo Estimado del Proceso  Cron sincronizadorD  ==> "+ ((new Double((tiempoFinal-tiempoInicial))/1000)/60)+" minutos");
+//    @Scheduled(cron="${cron.bcv}")
+//    public void sincronizacionBcv(){
+//        long tiempoInicial = System.currentTimeMillis();
+//        long tiempoFinal = 0;
+//        try {
+//            log.info("Llamado al servicio  " + tiempoInicial );
+//            RespuesatTasaBcvDto resp = bcvservicios.getDollarRate();
+//            RecRespStringDto respfinal = new RecRespStringDto();
+//            ConnectionUtil db = new ConnectionUtil();
+//            String  pmoneda = "02";
+//
+////            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+////            Date date = format.parse(resp.getLast_update());
+//            LocalDateTime datetime = LocalDateTime.now();
+//            LocalDateTime n = datetime.plusMinutes(30);
+//            ZonedDateTime caracas = n.atZone(ZoneId.of("America/Guyana"));
+//
+//            String fecha = n.toLocalDate().toString();
+//
+//
+//
+//
+//
+//
+//            respfinal = db.ActualizaBcv(pmoneda,resp.getPrice().toString(), fecha);
+//
+//            log.info("Respuesta de sincronizacionBcv " + resp);
+//
+//            tiempoFinal = System.currentTimeMillis();
+//
+//            log.info("Tiempo final " + tiempoFinal);
+//
+//        }catch (Exception e){
+//            log.error("AstWSApplication:sincronizacionBcv  ==>");
+//            log.error(e.getMessage());
+//        }
+//        log.info("Tiempo Estimado del Proceso  Cron sincronizadorD  ==> "+ ((new Double((tiempoFinal-tiempoInicial))/1000)/60)+" minutos");
 
 //    @Bean
 //    public WebMvcConfigurer corsConfigurer() {
@@ -227,4 +227,5 @@ ServicioHttpBcv bcvservicios;
 //        log.info("Tiempo Estimado del Proceso  Cron sincronizadorD  ==> ");
 //
 //    }
-}
+
+
