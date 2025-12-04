@@ -567,6 +567,64 @@ public class ConnectionContabilidad {
         return resp;
     }
 
+
+    public Resultado registrarasientos(AsientoContableDto entrada) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Resultado resp =   new Resultado();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+                CallableStatement stmt = conn.prepareCall("{call contabilidad.fn_generar_asiento_automatico(?,?,?,?,?,?)}");
+                stmt.registerOutParameter(1, Types.INTEGER);
+                stmt.setString(1, entrada.getIdOperacion());
+                stmt.setInt(2, entrada.getIdorigen());
+                stmt.setString(3, entrada.getFechaAsiento());
+                stmt.setString(4, entrada.getIdUsuario());
+                stmt.setString(5, entrada.getCodcia());
+                stmt.setDouble(6, entrada.getMonto());
+
+
+
+
+
+
+                stmt.execute();
+                Integer resultado = stmt.getInt(1);
+                Resultado sol = new Resultado();
+                sol.setSecuencia(resultado);
+                // resp.((resultado));
+                resp.setSecuencia((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+
     public List<OperacionContableDto> opercontables() {
 
         List<OperacionContableDto> resp =   new ArrayList<>();
@@ -1025,8 +1083,8 @@ public class ConnectionContabilidad {
                     sol.setIdAsiento(rs.getInt("id_asiento"));
                     sol.setFechaAsiento(rs.getString("fecha_asiento"));
                     sol.setDescripcion(rs.getString("descripcion"));
-                    sol.setIdOperacion(rs.getInt("id_operacion"));
-                    sol.setIdUsuario(rs.getInt("id_usuario"));
+                    sol.setIdOperacion(rs.getString("id_operacion"));
+                    sol.setIdUsuario(rs.getString("id_usuario"));
                     sol.setEstado(rs.getString("estado"));
 
 

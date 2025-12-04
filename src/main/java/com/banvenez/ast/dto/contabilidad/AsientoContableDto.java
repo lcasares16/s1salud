@@ -10,8 +10,11 @@ public class AsientoContableDto {
     private Integer idAsiento;
     private String fechaAsiento;
     private String descripcion;
-    private Integer idOperacion;
-    private Integer idUsuario;
+    private String idOperacion;
+    private String idUsuario;
     private String estado;
+    private Integer idorigen;
+    private String codcia;
+    private Double monto;
 
 }

@@ -226,4 +226,15 @@ public class ContabilidadController {
 
     }
 
+
+    @PostMapping("/registrar-asientos")
+    public Resultado registrasientos(@RequestBody AsientoContableDto registro){
+
+        Resultado solicitudes = new Resultado();
+        solicitudes = db.registrarasientos(registro
+        );
+
+        return solicitudes;
+    }
+
 }
