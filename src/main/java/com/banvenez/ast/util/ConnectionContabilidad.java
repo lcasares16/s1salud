@@ -624,6 +624,115 @@ public class ConnectionContabilidad {
 
 
 
+    public Resultado registracreencias(AcreenciasDto entrada) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Resultado resp =   new Resultado();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+                CallableStatement stmt = conn.prepareCall("{call contabilidad.fn_registrar_acreencia(?,?,?,?,?,?)}");
+                stmt.registerOutParameter(1, Types.INTEGER);
+                stmt.setString(1, entrada.getStsacre());
+                stmt.setString(2, entrada.getTipoacre());
+                stmt.setString(3, entrada.getCodmoneda());
+                stmt.setDouble(4, entrada.getMtoacrelocal());
+                stmt.setInt(5, entrada.getNumid());
+                stmt.setString(6, entrada.getTextacre());
+
+
+
+
+
+
+                stmt.execute();
+                Integer resultado = stmt.getInt(1);
+                Resultado sol = new Resultado();
+                sol.setSecuencia(resultado);
+                // resp.((resultado));
+                resp.setSecuencia((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+    public Resultado registrobligacion(ObligacionDto entrada) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Resultado resp =   new Resultado();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+                CallableStatement stmt = conn.prepareCall("{call contabilidad.fn_registrar_obligacion(?,?,?,?,?,?)}");
+                stmt.registerOutParameter(1, Types.INTEGER);
+                stmt.setString(1, entrada.getTipooblig());
+                stmt.setString(2, entrada.getStsoblig());
+                stmt.setString(3, entrada.getCodmoneda());
+                stmt.setDouble(4, entrada.getMtonetoobliglocal());
+                stmt.setInt(5, entrada.getNumid());
+                stmt.setString(6, entrada.getTextoblig());
+
+
+
+
+
+
+                stmt.execute();
+                Integer resultado = stmt.getInt(1);
+                Resultado sol = new Resultado();
+                sol.setSecuencia(resultado);
+                // resp.((resultado));
+                resp.setSecuencia((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
 
     public List<OperacionContableDto> opercontables() {
 

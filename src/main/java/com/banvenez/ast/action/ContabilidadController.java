@@ -237,4 +237,25 @@ public class ContabilidadController {
         return solicitudes;
     }
 
+
+    @PostMapping("/registrar-acreencia")
+    public Resultado registraracreencia(@RequestBody AcreenciasDto registro){
+
+        Resultado solicitudes = new Resultado();
+        solicitudes = db.registracreencias(registro
+        );
+
+        return solicitudes;
+    }
+
+    @PostMapping("/registrar-obligacion")
+    public Resultado registrarobligacion(@RequestBody ObligacionDto registro){
+
+        Resultado solicitudes = new Resultado();
+        solicitudes = db.registrobligacion(registro
+        );
+
+        return solicitudes;
+    }
+
 }
