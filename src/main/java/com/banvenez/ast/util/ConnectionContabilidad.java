@@ -733,6 +733,59 @@ public class ConnectionContabilidad {
     }
 
 
+    public Resultado registroconcepto(ParamCptoCtaDto entrada) {
+
+        Connection conn = null;
+        ConexionDto conexion = new ConexionDto();
+        Resultado resp =   new Resultado();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+                CallableStatement stmt = conn.prepareCall("{call contabilidad.crear_conceptos(?,?,?)}");
+                stmt.registerOutParameter(1, Types.INTEGER);
+                stmt.setString(1, entrada.getIdectadeb());
+                stmt.setString(2, entrada.getCodcptoacre());
+                stmt.setString(3, entrada.getCodcia());
+
+
+
+
+
+
+                stmt.execute();
+                Integer resultado = stmt.getInt(1);
+                Resultado sol = new Resultado();
+                sol.setSecuencia(resultado);
+                // resp.((resultado));
+                resp.setSecuencia((resultado));
+
+
+
+                conn.commit();
+                // rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
 
     public List<OperacionContableDto> opercontables() {
 
@@ -1219,7 +1272,7 @@ public class ConnectionContabilidad {
     }
 
 
-    public List<DetalleAsientoDto> asientosdetalle() {
+    public List<DetalleAsientoDto> asientosdetalle(DetalleAsientoDto asiento) {
 
         List<DetalleAsientoDto> resp =   new ArrayList<>();
 
@@ -1232,7 +1285,11 @@ public class ConnectionContabilidad {
 
                 CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_asientos_detalles()}");
                 stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
-
+                if (asiento.getIdAsiento() != null) {
+                    stmt.setInt(1, asiento.getIdAsiento());
+                } else {
+                    stmt.setNull(1, Types.INTEGER);
+                }
 
 
                 stmt.execute();
@@ -1366,7 +1423,7 @@ public class ConnectionContabilidad {
         return resp;
     }
 
-    public List<DetalleObligacionDto> obligaciondetalle() {
+    public List<DetalleObligacionDto> obligaciondetalle(DetalleObligacionDto entrada) {
 
         List<DetalleObligacionDto> resp =   new ArrayList<>();
 
@@ -1379,7 +1436,11 @@ public class ConnectionContabilidad {
 
                 CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_obligacion_det()}");
                 stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
-
+                if (entrada.getNumoblig() != null) {
+                    stmt.setInt(1, entrada.getNumoblig());
+                } else {
+                    stmt.setNull(1, Types.INTEGER);
+                }
 
 
                 stmt.execute();

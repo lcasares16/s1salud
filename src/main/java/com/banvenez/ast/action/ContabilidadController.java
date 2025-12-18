@@ -197,10 +197,10 @@ public class ContabilidadController {
     }
 
     @PostMapping("/consulta-asientos-detalle")
-    public List<DetalleAsientoDto> asientosdetalle(){
+    public List<DetalleAsientoDto> asientosdetalle(@RequestBody DetalleAsientoDto registro){
 
         List<DetalleAsientoDto> solicitudes = new ArrayList<DetalleAsientoDto>();
-        solicitudes = db.asientosdetalle();
+        solicitudes = db.asientosdetalle(registro);
         return solicitudes;
         //return new ResponseEntity<>(list, HttpStatus.OK);
 
@@ -217,10 +217,10 @@ public class ContabilidadController {
     }
 
     @PostMapping("/consulta-obligacion-detalle")
-    public List<DetalleObligacionDto> obligaciondetalle(){
+    public List<DetalleObligacionDto> obligaciondetalle(@RequestBody DetalleObligacionDto registro){
 
         List<DetalleObligacionDto> solicitudes = new ArrayList<DetalleObligacionDto>();
-        solicitudes = db.obligaciondetalle();
+        solicitudes = db.obligaciondetalle(registro);
         return solicitudes;
         //return new ResponseEntity<>(list, HttpStatus.OK);
 
@@ -253,6 +253,16 @@ public class ContabilidadController {
 
         Resultado solicitudes = new Resultado();
         solicitudes = db.registrobligacion(registro
+        );
+
+        return solicitudes;
+    }
+
+    @PostMapping("/registrar-conceptos")
+    public Resultado registrarconceptos(@RequestBody ParamCptoCtaDto registro){
+
+        Resultado solicitudes = new Resultado();
+        solicitudes = db.registroconcepto(registro
         );
 
         return solicitudes;

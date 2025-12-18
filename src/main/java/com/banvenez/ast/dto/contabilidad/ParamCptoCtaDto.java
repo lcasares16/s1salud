@@ -11,5 +11,6 @@ public class ParamCptoCtaDto {
     private String idecta;      // CHAR(37)
     private String tipmovDef;   // CHAR(1)
     private String codcia;      // CHAR(2)
-
+    private String idectadeb;
+    private String idectacre;
 }
