@@ -25,5 +25,6 @@ public class ConceptoAcreenciaDto {
     private String indImpGtoMan;        // character(1)
     private String indCptoPServicio;    // character(1)
     private String indCptoIServicio;    // character(1)
+    private String tipoacre;
 
 }

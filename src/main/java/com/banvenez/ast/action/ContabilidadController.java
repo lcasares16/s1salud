@@ -268,4 +268,15 @@ public class ContabilidadController {
         return solicitudes;
     }
 
+
+    @PostMapping("/consulta-conceptos-acreencias")
+    public List<ConceptoAcreenciaDto> conceptos(){
+
+        List<ConceptoAcreenciaDto> solicitudes = new ArrayList<ConceptoAcreenciaDto>();
+        solicitudes = db.conceptosacre();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
 }

@@ -747,9 +747,9 @@ public class ConnectionContabilidad {
             if (conn != null) {
 
                 CallableStatement stmt = conn.prepareCall("{call contabilidad.crear_conceptos(?,?,?)}");
-                stmt.registerOutParameter(1, Types.INTEGER);
+                stmt.registerOutParameter(1, Types.VARCHAR);
                 stmt.setString(1, entrada.getIdectadeb());
-                stmt.setString(2, entrada.getCodcptoacre());
+                stmt.setString(2, entrada.getIdectacre());
                 stmt.setString(3, entrada.getCodcia());
 
 
@@ -758,11 +758,11 @@ public class ConnectionContabilidad {
 
 
                 stmt.execute();
-                Integer resultado = stmt.getInt(1);
+                String resultado = stmt.getString(1);
                 Resultado sol = new Resultado();
-                sol.setSecuencia(resultado);
+                sol.setRetorno(resultado);
                 // resp.((resultado));
-                resp.setSecuencia((resultado));
+                resp.setRetorno((resultado));
 
 
 
@@ -1400,6 +1400,65 @@ public class ConnectionContabilidad {
                     sol.setClaseobli(rs.getString("claseobli"));
                     sol.setTramite(rs.getString("tramite"));
                     sol.setSeriecttorea(rs.getInt("seriecttorea"));
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+    public List<ConceptoAcreenciaDto> conceptosacre() {
+
+        List<ConceptoAcreenciaDto> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.servicio_concepto_acre()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+                while (rs.next()) {
+
+
+
+                    ConceptoAcreenciaDto sol = new ConceptoAcreenciaDto();
+
+                    sol.setCodGrupoAcre(rs.getString("codgrupoacre"));
+                    sol.setCodCptoAcre(rs.getString("codcptoacre"));
+                    sol.setDescCptoAcre(rs.getString("desccptoacre"));          // ahora String
+                    sol.setTipoacre(rs.getString("tipoacre"));
+
+
 
 
                     resp.add(sol);
