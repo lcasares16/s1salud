@@ -581,14 +581,18 @@ public class ConnectionContabilidad {
             conn.setAutoCommit(false);
             if (conn != null) {
 
-                CallableStatement stmt = conn.prepareCall("{call contabilidad.fn_generar_asiento_automatico(?,?,?,?,?,?)}");
+                String idOperacionCorto = entrada.getIdOperacion().substring(0, 3);
+
+                String fechaunica = "19-12-2025";
+
+                CallableStatement stmt = conn.prepareCall("{call contabilidad.fn_generar_asiento_automatico(?,?,?,?,?)}");
                 stmt.registerOutParameter(1, Types.INTEGER);
-                stmt.setString(1, entrada.getIdOperacion());
-                stmt.setInt(2, entrada.getIdorigen());
-                stmt.setString(3, entrada.getFechaAsiento());
-                stmt.setString(4, entrada.getIdUsuario());
-                stmt.setString(5, entrada.getCodcia());
-                stmt.setDouble(6, entrada.getMonto());
+                stmt.setString(1, idOperacionCorto);
+              //  stmt.setInt(2, entrada.getIdorigen());
+                stmt.setString(2, fechaunica);
+                stmt.setString(3, entrada.getIdUsuario());
+                stmt.setString(4, entrada.getCodcia());
+                stmt.setDouble(5, entrada.getMonto());
 
 
 
