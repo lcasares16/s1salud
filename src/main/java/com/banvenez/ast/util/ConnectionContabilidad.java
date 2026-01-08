@@ -790,6 +790,415 @@ public class ConnectionContabilidad {
 
 
 
+    public List<RepContable> fn_balance_comprobacion(RepEntrada entrada) {
+
+        List<RepContable> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.fn_balance_comprobacion()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, entrada.getFechaDesde());
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    RepContable sol = new RepContable();
+
+                    sol.setIdecta(rs.getString("idecta"));
+                    sol.setCodigocuenta(rs.getString("codigo_cuenta"));
+                    sol.setNombrecuenta(rs.getString("nombre_cuenta"));
+                    sol.setDebitos(rs.getDouble("debitos"));
+                    sol.setCreditos(rs.getDouble("creditos"));
+                    sol.setSaldo(rs.getDouble("saldo"));
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+    public List<RepContable> fn_balance_detallado(RepEntrada entrada) {
+
+        List<RepContable> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.fn_balance_detallado()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, entrada.getFechaDesde());
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    RepContable sol = new RepContable();
+
+                    sol.setTipo(rs.getString("tipo"));
+                    sol.setCodigo(rs.getString("codigo"));
+                    sol.setNombrecuenta(rs.getString("cuenta"));
+                    sol.setTotal(rs.getDouble("total"));
+
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<RepContable> fn_balance_general(RepEntrada entrada) {
+
+        List<RepContable> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.fn_balance_general()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, entrada.getFechaDesde());
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    RepContable sol = new RepContable();
+
+                    sol.setTipo(rs.getString("tipo"));
+                    sol.setCodigo(rs.getString("codigo"));
+                    sol.setTotal(rs.getDouble("total"));
+
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+    public List<RepContable> fn_estado_resultado(RepEntrada entrada) {
+
+        List<RepContable> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.fn_estado_resultado()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, entrada.getFechaDesde());
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    RepContable sol = new RepContable();
+
+                    sol.setConcepto(rs.getString("concepto"));
+                    sol.setMonto(rs.getDouble("monto"));
+
+
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+    public List<RepContable> fn_estado_resultado_detallado(RepEntrada entrada) {
+
+        List<RepContable> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.fn_estado_resultado_detallado()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, entrada.getFechaDesde());
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    RepContable sol = new RepContable();
+
+                    sol.setTipo(rs.getString("tipo"));
+                    sol.setNombrecuenta(rs.getString("cuenta"));
+                    sol.setMonto(rs.getDouble("monto"));
+
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+    public List<RepContable> fn_libro_diario(RepEntrada entrada) {
+
+        List<RepContable> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.fn_libro_diario(?)}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, entrada.getFechaDesde());
+                stmt.setString(2, entrada.getFechaHasta());
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    RepContable sol = new RepContable();
+
+                    sol.setFecha(rs.getString("fecha"));
+                    sol.setNrocomprobante(rs.getInt("comprobante"));
+                    sol.setTipocomprobante(rs.getString("tipo_comprobante"));
+                    sol.setIdecta(rs.getString("idecta"));
+                    sol.setCodigocuenta(rs.getString("codigo_cuenta"));
+                    sol.setNombrecuenta(rs.getString("nombre_cuenta"));
+                    sol.setDetalle(rs.getString("detalle"));
+                    sol.setDebitos(rs.getDouble("debito"));
+                    sol.setCreditos(rs.getDouble("credito"));
+
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+
+    public List<RepContable> fn_libro_mayor(RepEntrada entrada) {
+
+        List<RepContable> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.fn_libro_mayor(?)}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+                stmt.setString(1, entrada.getFechaDesde());
+                stmt.setString(2, entrada.getFechaHasta());
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+                while (rs.next()) {
+
+
+
+                    RepContable sol = new RepContable();
+
+                    sol.setIdecta(rs.getString("idecta"));
+                    sol.setCodigocuenta(rs.getString("codigo_cuenta"));
+                    sol.setNombrecuenta(rs.getString("nombre_cuenta"));
+                    sol.setDebitos(rs.getDouble("debitos"));
+                    sol.setCreditos(rs.getDouble("creditos"));
+                    sol.setSaldo(rs.getDouble("saldo"));
+
+
+
+
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
 
     public List<OperacionContableDto> opercontables() {
 
@@ -1464,6 +1873,60 @@ public class ConnectionContabilidad {
 
 
 
+
+                    resp.add(sol);
+                }
+
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+
+                System.out.println("Connection Exitosa");
+            } else {
+                System.out.println("Connection Fallida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return resp;
+    }
+
+
+
+    public List<RepEstatusConc> estatusconceptosacre() {
+
+        List<RepEstatusConc> resp =   new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(conexion.getUrl() + conexion.getDbname(), conexion.getUser(), conexion.getPass());
+            conn.setAutoCommit(false);
+            if (conn != null) {
+
+
+                CallableStatement stmt = conn.prepareCall("{? = call contabilidad.consulta_estaus_conceptos()}");
+                stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
+
+
+
+                stmt.execute();
+
+                ResultSet rs = (ResultSet) stmt.getObject(1); // Obtener el resultado como ResultSet
+
+
+
+                while (rs.next()) {
+
+
+
+                    RepEstatusConc sol = new RepEstatusConc();
+
+                    sol.setCodigo(rs.getString("codigo"));
+                    sol.setNombre(rs.getString("nombre"));
 
                     resp.add(sol);
                 }

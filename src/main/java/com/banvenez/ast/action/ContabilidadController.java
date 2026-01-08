@@ -279,4 +279,87 @@ public class ContabilidadController {
 
     }
 
+    @PostMapping("/balance-comprobacion")
+    public  List<RepContable> balancecomprobacion(@RequestBody RepEntrada registro){
+
+        List<RepContable> solicitudes = new ArrayList<RepContable>();
+        solicitudes = db.fn_balance_comprobacion(registro
+        );
+
+        return solicitudes;
+    }
+
+
+    @PostMapping("/balance-detallado")
+    public  List<RepContable> balancedetallado(@RequestBody RepEntrada registro){
+
+        List<RepContable> solicitudes = new ArrayList<RepContable>();
+        solicitudes = db.fn_balance_detallado(registro
+        );
+
+        return solicitudes;
+    }
+
+    @PostMapping("/balance-general")
+    public  List<RepContable> balancegeneral(@RequestBody RepEntrada registro){
+
+        List<RepContable> solicitudes = new ArrayList<RepContable>();
+        solicitudes = db.fn_balance_general(registro
+        );
+
+        return solicitudes;
+    }
+
+    @PostMapping("/estado-resultado")
+    public  List<RepContable> estadoresultado(@RequestBody RepEntrada registro){
+
+        List<RepContable> solicitudes = new ArrayList<RepContable>();
+        solicitudes = db.fn_estado_resultado(registro
+        );
+
+        return solicitudes;
+    }
+
+
+    @PostMapping("/estado-resultado-det")
+    public  List<RepContable> estadoresultadodetallado(@RequestBody RepEntrada registro){
+
+        List<RepContable> solicitudes = new ArrayList<RepContable>();
+        solicitudes = db.fn_estado_resultado_detallado(registro
+        );
+
+        return solicitudes;
+    }
+
+    @PostMapping("/libro-diario")
+    public  List<RepContable> librodiario(@RequestBody RepEntrada registro){
+
+        List<RepContable> solicitudes = new ArrayList<RepContable>();
+        solicitudes = db.fn_libro_diario(registro
+        );
+
+        return solicitudes;
+    }
+
+    @PostMapping("/libro-mayor")
+    public  List<RepContable> libromayor(@RequestBody RepEntrada registro){
+
+        List<RepContable> solicitudes = new ArrayList<RepContable>();
+        solicitudes = db.fn_libro_mayor(registro
+        );
+
+        return solicitudes;
+    }
+
+
+    @PostMapping("/consulta-estatus-conceptos")
+    public List<RepEstatusConc> estatusconceptos(){
+
+        List<RepEstatusConc> solicitudes = new ArrayList<RepEstatusConc>();
+        solicitudes = db.estatusconceptosacre();
+        return solicitudes;
+        //return new ResponseEntity<>(list, HttpStatus.OK);
+
+    }
+
 }
