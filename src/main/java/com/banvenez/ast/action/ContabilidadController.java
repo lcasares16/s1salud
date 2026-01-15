@@ -270,10 +270,10 @@ public class ContabilidadController {
 
 
     @PostMapping("/consulta-conceptos-acreencias")
-    public List<ConceptoAcreenciaDto> conceptos(){
+    public List<ConceptoAcreenciaDto> conceptos(@RequestBody TipoConceptoDto registro){
 
         List<ConceptoAcreenciaDto> solicitudes = new ArrayList<ConceptoAcreenciaDto>();
-        solicitudes = db.conceptosacre();
+        solicitudes = db.conceptosacre(registro);
         return solicitudes;
         //return new ResponseEntity<>(list, HttpStatus.OK);
 

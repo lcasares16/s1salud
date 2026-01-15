@@ -1838,7 +1838,7 @@ public class ConnectionContabilidad {
 
 
 
-    public List<ConceptoAcreenciaDto> conceptosacre() {
+    public List<ConceptoAcreenciaDto> conceptosacre(TipoConceptoDto entrada) {
 
         List<ConceptoAcreenciaDto> resp =   new ArrayList<>();
 
@@ -1851,7 +1851,7 @@ public class ConnectionContabilidad {
 
                 CallableStatement stmt = conn.prepareCall("{? = call contabilidad.servicio_concepto_acre()}");
                 stmt.registerOutParameter(1, Types.OTHER); // Set the output parameter type
-
+                stmt.setString(1, entrada.getConcepto());
 
 
                 stmt.execute();
