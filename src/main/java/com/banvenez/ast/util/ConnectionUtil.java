@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9727,9 +9728,9 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                     sol.setCodarticulo(rs.getString("cod_articulo"));
                     sol.setDescripcion(rs.getString("descripcion"));
                     sol.setCodtipo(rs.getInt("cod_tipo"));
-                    sol.setCantidad(rs.getInt("cantidad"));
-                    sol.setPreciocosto(rs.getDouble("precio_costo"));
-                    sol.setPrecioventa(rs.getDouble("precio_venta"));
+                    sol.setCantidad(rs.getLong("cantidad"));
+                    sol.setPreciocosto(rs.getBigDecimal("precio_costo"));
+                    sol.setPrecioventa(rs.getBigDecimal("precio_venta"));
                     sol.setDescuento(rs.getDouble("descuento"));
                     sol.setVolumen(rs.getInt("volumen"));
                     sol.setDescstatus(rs.getString("descripcion_estaus"));
@@ -9865,10 +9866,10 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
     public Resultado registrar_inventario(
             String   descripcion,
             Integer  codtipo,
-            Integer  cantidad,
-            Double   preciocosto,
-            Double   precioventa,
-            Double   descuento,
+            Long     cantidad,
+            BigDecimal   preciocosto,
+            BigDecimal    precioventa,
+            Double    descuento,
             Integer  volumen,
             String   status,
             String   fechamod,
@@ -9891,9 +9892,9 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 stmt.registerOutParameter(1, Types.VARCHAR);
                 stmt.setString(1, descripcion);
                 stmt.setInt(2, codtipo);
-                stmt.setInt(3, cantidad);
-                stmt.setDouble(4, preciocosto);
-                stmt.setDouble(5, precioventa);
+                stmt.setLong(3, cantidad);
+                stmt.setBigDecimal(4, preciocosto);
+                stmt.setBigDecimal(5, precioventa);
                 stmt.setDouble(6, descuento);
                 stmt.setInt(7, volumen);
                 stmt.setString(8, status);
@@ -9936,9 +9937,9 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
             String   codarticulo,
             String   descripcion,
             Integer  codtipo,
-            Integer  cantidad,
-            Double   preciocosto,
-            Double   precioventa,
+            Long  cantidad,
+            BigDecimal    preciocosto,
+            BigDecimal    precioventa,
             Double   descuento,
             Integer  volumen,
             String   status,
@@ -9963,9 +9964,9 @@ public List<RetornaReferenciaDto> ReferenciaPagosCrono( String fecha1, String fe
                 stmt.setString(1, codarticulo);
                 stmt.setString(2, descripcion);
                 stmt.setInt(3, codtipo);
-                stmt.setInt(4, cantidad);
-                stmt.setDouble(5, preciocosto);
-                stmt.setDouble(6, precioventa);
+                stmt.setLong(4, cantidad);
+                stmt.setBigDecimal(5, preciocosto);
+                stmt.setBigDecimal(6, precioventa);
                 stmt.setDouble(7, descuento);
                 stmt.setInt(8, volumen);
                 stmt.setString(9, status);
